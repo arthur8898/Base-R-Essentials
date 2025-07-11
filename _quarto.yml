@@ -1,0 +1,37 @@
+project:
+  type: book
+  output-dir: docs
+  
+
+book:
+  title: "Base R Essentials"
+  author: "Arthur Li"
+  date: today
+  chapters:
+    - index.qmd
+    - intro.qmd
+    - objects1.qmd
+    - objects2.qmd
+    - Subsetting.qmd
+    - functions.qmd
+    - iteration.qmd
+
+bibliography: references.bib
+
+format:
+  pdf:
+    documentclass: scrreprt
+    include-in-header: 
+      text: '\pagenumbering{gobble}'
+  html:
+    theme: cosmo
+  
+editor: visual
+
+
+
+
+
+
+      
+ 

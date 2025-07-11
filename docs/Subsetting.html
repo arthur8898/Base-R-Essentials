@@ -1,0 +1,1690 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>4&nbsp; Subsetting Objects – Base R Essentials</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./functions.html" rel="next">
+<link href="./objects2.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Subsetting.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Subsetting Objects</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Base R Essentials</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Getting Started with Base R</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./objects1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Objects - Vectors, Matrices, and Arrays</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./objects2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Objects - Lists and Data Frames</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Subsetting.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Subsetting Objects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Writing User-Defined Functions</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Iteration</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#index-vectors" id="toc-index-vectors" class="nav-link active" data-scroll-target="#index-vectors"><span class="header-section-number">4.1</span> Index Vectors</a>
+  <ul class="collapse">
+  <li><a href="#type-1-a-logical-index" id="toc-type-1-a-logical-index" class="nav-link" data-scroll-target="#type-1-a-logical-index"><span class="header-section-number">4.1.1</span> Type 1: A Logical Index</a></li>
+  <li><a href="#type-2-a-positive-integer-index" id="toc-type-2-a-positive-integer-index" class="nav-link" data-scroll-target="#type-2-a-positive-integer-index"><span class="header-section-number">4.1.2</span> Type 2: A Positive Integer Index</a></li>
+  <li><a href="#type-3-a-negative-integer-index" id="toc-type-3-a-negative-integer-index" class="nav-link" data-scroll-target="#type-3-a-negative-integer-index"><span class="header-section-number">4.1.3</span> Type 3: A Negative Integer Index</a></li>
+  <li><a href="#type-4-a-character-index" id="toc-type-4-a-character-index" class="nav-link" data-scroll-target="#type-4-a-character-index"><span class="header-section-number">4.1.4</span> Type 4: A Character Index</a></li>
+  <li><a href="#type-5-an-empty-index" id="toc-type-5-an-empty-index" class="nav-link" data-scroll-target="#type-5-an-empty-index"><span class="header-section-number">4.1.5</span> Type 5: An Empty Index</a></li>
+  </ul></li>
+  <li><a href="#index-vector-replacement" id="toc-index-vector-replacement" class="nav-link" data-scroll-target="#index-vector-replacement"><span class="header-section-number">4.2</span> Index Vector: Replacement</a></li>
+  <li><a href="#utilizing-index-vectors-in-various-applications" id="toc-utilizing-index-vectors-in-various-applications" class="nav-link" data-scroll-target="#utilizing-index-vectors-in-various-applications"><span class="header-section-number">4.3</span> Utilizing Index Vectors in Various Applications</a>
+  <ul class="collapse">
+  <li><a href="#recoding-variables" id="toc-recoding-variables" class="nav-link" data-scroll-target="#recoding-variables"><span class="header-section-number">4.3.1</span> Recoding Variables</a></li>
+  <li><a href="#imputing-missing-numerical-values" id="toc-imputing-missing-numerical-values" class="nav-link" data-scroll-target="#imputing-missing-numerical-values"><span class="header-section-number">4.3.2</span> Imputing Missing Numerical Values</a></li>
+  <li><a href="#imputing-missing-character-values" id="toc-imputing-missing-character-values" class="nav-link" data-scroll-target="#imputing-missing-character-values"><span class="header-section-number">4.3.3</span> Imputing Missing Character Values</a></li>
+  </ul></li>
+  <li><a href="#matrix-indexing" id="toc-matrix-indexing" class="nav-link" data-scroll-target="#matrix-indexing"><span class="header-section-number">4.4</span> Matrix Indexing</a></li>
+  <li><a href="#subsetting-data-frames" id="toc-subsetting-data-frames" class="nav-link" data-scroll-target="#subsetting-data-frames"><span class="header-section-number">4.5</span> Subsetting Data Frames</a>
+  <ul class="collapse">
+  <li><a href="#subsetting-a-data-frame-as-a-matrix" id="toc-subsetting-a-data-frame-as-a-matrix" class="nav-link" data-scroll-target="#subsetting-a-data-frame-as-a-matrix"><span class="header-section-number">4.5.1</span> Subsetting a Data Frame as a Matrix</a></li>
+  <li><a href="#subsetting-a-data-frame-as-a-list" id="toc-subsetting-a-data-frame-as-a-list" class="nav-link" data-scroll-target="#subsetting-a-data-frame-as-a-list"><span class="header-section-number">4.5.2</span> Subsetting a Data Frame as a List</a></li>
+  <li><a href="#sorting-a-data-frame" id="toc-sorting-a-data-frame" class="nav-link" data-scroll-target="#sorting-a-data-frame"><span class="header-section-number">4.5.3</span> Sorting a Data Frame</a></li>
+  </ul></li>
+  <li><a href="#the-differences-between-and" id="toc-the-differences-between-and" class="nav-link" data-scroll-target="#the-differences-between-and"><span class="header-section-number">4.6</span> The Differences Between <code>[</code>, <code>[[</code>, and <code>$</code></a>
+  <ul class="collapse">
+  <li><a href="#selecting-a-single-column-from-a-data-frame" id="toc-selecting-a-single-column-from-a-data-frame" class="nav-link" data-scroll-target="#selecting-a-single-column-from-a-data-frame"><span class="header-section-number">4.6.1</span> Selecting a Single Column from a Data Frame</a></li>
+  <li><a href="#selecting-one-or-several-components-from-an-object" id="toc-selecting-one-or-several-components-from-an-object" class="nav-link" data-scroll-target="#selecting-one-or-several-components-from-an-object"><span class="header-section-number">4.6.2</span> Selecting One or Several Components from an Object</a></li>
+  <li><a href="#using-operators-for-evaluations" id="toc-using-operators-for-evaluations" class="nav-link" data-scroll-target="#using-operators-for-evaluations"><span class="header-section-number">4.6.3</span> Using Operators for Evaluations</a></li>
+  <li><a href="#partial-matching" id="toc-partial-matching" class="nav-link" data-scroll-target="#partial-matching"><span class="header-section-number">4.6.4</span> Partial Matching</a></li>
+  </ul></li>
+  <li><a href="#simplifying-and-preserving" id="toc-simplifying-and-preserving" class="nav-link" data-scroll-target="#simplifying-and-preserving"><span class="header-section-number">4.7</span> Simplifying and Preserving</a>
+  <ul class="collapse">
+  <li><a href="#simplifying-and-preserving-vectors" id="toc-simplifying-and-preserving-vectors" class="nav-link" data-scroll-target="#simplifying-and-preserving-vectors"><span class="header-section-number">4.7.1</span> Simplifying and Preserving: Vectors</a></li>
+  <li><a href="#simplifying-and-preserving-factors" id="toc-simplifying-and-preserving-factors" class="nav-link" data-scroll-target="#simplifying-and-preserving-factors"><span class="header-section-number">4.7.2</span> Simplifying and Preserving: Factors</a></li>
+  <li><a href="#simplifying-and-preserving-matrices" id="toc-simplifying-and-preserving-matrices" class="nav-link" data-scroll-target="#simplifying-and-preserving-matrices"><span class="header-section-number">4.7.3</span> Simplifying and Preserving: Matrices</a></li>
+  <li><a href="#simplifying-and-preserving-lists" id="toc-simplifying-and-preserving-lists" class="nav-link" data-scroll-target="#simplifying-and-preserving-lists"><span class="header-section-number">4.7.4</span> Simplifying and Preserving: Lists</a></li>
+  <li><a href="#simplifying-and-preserving-data-frames" id="toc-simplifying-and-preserving-data-frames" class="nav-link" data-scroll-target="#simplifying-and-preserving-data-frames"><span class="header-section-number">4.7.5</span> Simplifying and Preserving: Data Frames</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Subsetting Objects</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Subsetting is one of the most fundamental operations in R. It allows us to extract specific elements from a data structure, such as a vector, matrix, data frame, or list. Whether we want to access a single value or an entire section of a dataset, subsetting provides the flexibility to focus on just the parts we need. R offers a variety of subsetting methods using indices, logical conditions, or names, depending on the structure of the object. Learning how to subset effectively is key to data manipulation, exploration, and analysis. In this chapter, we will explore different ways to subset each type of object introduced earlier and understand the behavior of subsetting operations in R.</p>
+<section id="index-vectors" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="index-vectors"><span class="header-section-number">4.1</span> Index Vectors</h2>
+<p>When subsetting an object in R, we use an index vector to specify which elements we want to extract. This index vector is placed inside square brackets after the object name. R supports five types of index vectors, and each type offers a different way to reference elements. It’s important to remember that these types should not be mixed within a single subsetting operation. In this section, we will introduce each of the five types and demonstrate how they can be used to subset a simple vector.</p>
+<section id="type-1-a-logical-index" class="level3" data-number="4.1.1">
+<h3 data-number="4.1.1" class="anchored" data-anchor-id="type-1-a-logical-index"><span class="header-section-number">4.1.1</span> Type 1: A Logical Index</h3>
+<p>One way to subset a vector in R is by using a logical index. A logical index is a vector made up of <code>TRUE</code>, <code>FALSE</code>, and <code>NA</code> values. When applied to a target vector, only the elements that correspond to <code>TRUE</code> in the logical index will be selected. Elements paired with <code>FALSE</code> are excluded, and those paired with <code>NA</code> will return <code>NA</code> in the output.</p>
+<p>In the following example, we create a vector a that contains a missing value. To select only the non-missing elements, we use <code>!is.na(a)</code> as the logical index.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="cn">NA</span>, <span class="dv">7</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">is.na</span>(a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE FALSE FALSE  TRUE FALSE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="sc">!</span><span class="fu">is.na</span>(a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  TRUE  TRUE  TRUE FALSE  TRUE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>a[<span class="sc">!</span><span class="fu">is.na</span>(a)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1 3 5 7</code></pre>
+</div>
+</div>
+<p>We can also use logical conditions directly. For example, the expression <code>a &gt; 3</code> creates a logical vector indicating which elements in <code>a</code> are greater than 3. However, be aware that if the vector contains missing values, the condition will return <code>NA</code> for those entries.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>a <span class="sc">&gt;</span> <span class="dv">3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE FALSE  TRUE    NA  TRUE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>a[a <span class="sc">&gt;</span> <span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  5 NA  7</code></pre>
+</div>
+</div>
+<p>This kind of indexing is particularly useful when filtering data based on conditions or when working with missing values.</p>
+</section>
+<section id="type-2-a-positive-integer-index" class="level3" data-number="4.1.2">
+<h3 data-number="4.1.2" class="anchored" data-anchor-id="type-2-a-positive-integer-index"><span class="header-section-number">4.1.2</span> Type 2: A Positive Integer Index</h3>
+<p>Another common method for subsetting a vector is to use a positive integer index. This index vector specifies the positions of the elements to extract from the target vector. The index vector can be of any length—shorter or longer than the original vector—and the resulting output will include the values at those specified positions, in the order listed.</p>
+<p>In the example below, we use a positive integer index to extract the first, second, third, and then second element again from vector a.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="cn">NA</span>, <span class="dv">7</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>a[<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="dv">2</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1 3 5 3</code></pre>
+</div>
+</div>
+<p>A useful tool when working with logical conditions is the <code>which()</code> function. Instead of returning a logical vector, <code>which()</code> returns the integer positions of elements that satisfy a condition, automatically excluding any <code>NA</code> values. This makes it a safer and often preferred option over direct logical indexing when the presence of missing values is a concern.</p>
+<p>Compare the results of the two approaches below:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>a[a <span class="sc">&gt;</span> <span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  5 NA  7</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">which</span>(a <span class="sc">&gt;</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3 5</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>a[<span class="fu">which</span>(a <span class="sc">&gt;</span> <span class="dv">3</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 5 7</code></pre>
+</div>
+</div>
+<p>The first line returns a result with an <code>NA</code> due to the missing value in a, while the second line avoids this issue by subsetting only on valid positions.</p>
+<p>It’s also worth noting that any 0 values in a positive integer index vector are ignored and do not return corresponding elements.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>a[<span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">2</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3</code></pre>
+</div>
+</div>
+</section>
+<section id="type-3-a-negative-integer-index" class="level3" data-number="4.1.3">
+<h3 data-number="4.1.3" class="anchored" data-anchor-id="type-3-a-negative-integer-index"><span class="header-section-number">4.1.3</span> Type 3: A Negative Integer Index</h3>
+<p>In addition to selecting specific elements, you can also exclude elements from a vector using a negative integer index. By placing a minus sign in front of the index values, R will omit those positions from the result.</p>
+<p>For example, the following code removes the first and fourth elements from vector <code>a</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="cn">NA</span>, <span class="dv">7</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>a[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">4</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3 5 7</code></pre>
+</div>
+</div>
+<p>This approach is especially helpful when you want to drop a small number of elements from a larger vector without having to specify everything you want to keep.</p>
+<p>One important rule to remember: you cannot mix positive and negative indices in the same index vector. Doing so will result in an error.</p>
+</section>
+<section id="type-4-a-character-index" class="level3" data-number="4.1.4">
+<h3 data-number="4.1.4" class="anchored" data-anchor-id="type-4-a-character-index"><span class="header-section-number">4.1.4</span> Type 4: A Character Index</h3>
+<p>If a vector has a <code>names</code> attribute, you can subset it using a character index vector by specifying the element names. This method allows for intuitive selection when working with named elements.</p>
+<p>For example, the following code attempts to select elements <code>"a"</code> and <code>"c"</code> from vector <code>a</code>. Initially, this returns <code>NA</code> values because a has no assigned names:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="cn">NA</span>, <span class="dv">7</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>a[<span class="fu">c</span>(<span class="st">"a"</span>,<span class="st">"c"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] NA NA</code></pre>
+</div>
+</div>
+<p>To make this operation meaningful, you must first assign <code>names</code> to the elements of <code>a</code>. After doing so, the same character index will correctly return the corresponding values:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(a) <span class="ot">&lt;-</span> letters[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>] <span class="do">## Assign names with a - e</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>a[<span class="fu">c</span>(<span class="st">"a"</span>,<span class="st">"c"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>a c 
+1 5 </code></pre>
+</div>
+</div>
+<p>Note that the length of the character index vector can be shorter or longer than the target vector. If any name in the index is not found in the object, R will return <code>NA</code> for that position.</p>
+</section>
+<section id="type-5-an-empty-index" class="level3" data-number="4.1.5">
+<h3 data-number="4.1.5" class="anchored" data-anchor-id="type-5-an-empty-index"><span class="header-section-number">4.1.5</span> Type 5: An Empty Index</h3>
+<p>An empty index can be used to select all elements from a vector. When you leave the square brackets empty, R returns the entire object without any subsetting:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>a[]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> a  b  c  d  e 
+ 1  3  5 NA  7 </code></pre>
+</div>
+</div>
+<p>While this may not seem especially helpful when working with vectors, it becomes much more useful for more complex structures like matrices, arrays, or data frames—particularly when you want to extract all rows or columns without specifying them explicitly.</p>
+</section>
+</section>
+<section id="index-vector-replacement" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="index-vector-replacement"><span class="header-section-number">4.2</span> Index Vector: Replacement</h2>
+<p>In R, “replacement” refers to modifying existing values or attributes within an object. Many R functions support this operation. For instance, the <code>names()</code> function can both retrieve and assign <code>names</code> to an object. If you consult its help file, you will find the following syntax:</p>
+<p><code>names(x)</code></p>
+<p><code>names(x) &lt;- value</code></p>
+<p>The second form illustrates the concept of replacement.</p>
+<p>Just like subsetting, all five types of index vectors can also be used for replacement. In the following example, we use a logical index vector to identify missing values in vector <code>x</code>, and then replace those values with 0:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">6</span>, <span class="cn">NA</span>, <span class="sc">-</span><span class="dv">1</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>x[<span class="fu">is.na</span>(x)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  3  6  0 -1</code></pre>
+</div>
+</div>
+<p>The next example uses a positive integer index vector to replace the second and fourth elements with <code>10</code> and <code>20</code>, respectively:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>x[<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">4</span>)] <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">20</span>)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  3 10  0 20</code></pre>
+</div>
+</div>
+<p>To replace all elements in x except for the first and second, we use a negative integer index vector. All remaining elements are replaced with the value <code>4</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>x[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)] <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  3 10  4  4</code></pre>
+</div>
+</div>
+<p>Once names are assigned to a vector, we can also use a character index vector for replacement. Here, we replace the elements named <code>"a"</code> and <code>"c"</code> with 0:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(x) <span class="ot">&lt;-</span> letters[<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>]</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> a  b  c  d 
+ 3 10  4  4 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>x[<span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"c"</span>)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> a  b  c  d 
+ 0 10  0  4 </code></pre>
+</div>
+</div>
+<p>Finally, an empty index can appear on the left-hand side of an assignment. This replaces all values while preserving the object’s structure and type. In this example, all elements of <code>x</code> are set to 0:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>x[] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>a b c d 
+0 0 0 0 </code></pre>
+</div>
+</div>
+</section>
+<section id="utilizing-index-vectors-in-various-applications" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="utilizing-index-vectors-in-various-applications"><span class="header-section-number">4.3</span> Utilizing Index Vectors in Various Applications</h2>
+<section id="recoding-variables" class="level3" data-number="4.3.1">
+<h3 data-number="4.3.1" class="anchored" data-anchor-id="recoding-variables"><span class="header-section-number">4.3.1</span> Recoding Variables</h3>
+<p>One common use of indexing is to recode variables, especially character vectors. In this example, we demonstrate how to use character indexing to recode a character vector named <code>Sex</code>, which contains values <code>"M"</code> and <code>"F"</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>Sex <span class="ot">&lt;-</span>  <span class="fu">c</span>(<span class="st">"M"</span>, <span class="st">"F"</span>, <span class="st">"F"</span>, <span class="st">"M"</span>, <span class="st">"M"</span>, <span class="st">"F"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Our goal is to convert this vector into a more descriptive form, replacing <code>"M"</code> with <code>"Male"</code> and <code>"F"</code> with <code>"Female"</code>. To achieve this, we first create a named character vector called <code>convert</code>. The values are <code>"Male"</code> and <code>"Female"</code>, with names <code>"M"</code> and <code>"F"</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>convert <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">M =</span> <span class="st">"Male"</span>, <span class="at">F =</span> <span class="st">"Female"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Since <code>convert</code> is a named vector, we can subset its components by specifying their names, as shown in the example below. Notice that the length of the index vector can vary, and the resulting output has the same length as the index vector.</p>
+<p>Since <code>convert</code> has <code>names</code> assigned, we can subset it by those names. Below are a few examples. Notice that the resulting output matches the length and order of the index vector:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>convert[<span class="st">"M"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     M 
+"Male" </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>convert[<span class="fu">c</span>(<span class="st">"F"</span>, <span class="st">"M"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       F        M 
+"Female"   "Male" </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>convert[<span class="fu">c</span>(<span class="st">"F"</span>, <span class="st">"M"</span>, <span class="st">"F"</span>, <span class="st">"F"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       F        M        F        F 
+"Female"   "Male" "Female" "Female" </code></pre>
+</div>
+</div>
+<p>In the final step, we use the <code>Sex</code> vector itself as the index to the <code>convert</code> vector. This produces the recoded values directly:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>Sex_recode <span class="ot">&lt;-</span>convert[Sex]</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>Sex_recode</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       M        F        F        M        M        F 
+  "Male" "Female" "Female"   "Male"   "Male" "Female" </code></pre>
+</div>
+</div>
+</section>
+<section id="imputing-missing-numerical-values" class="level3" data-number="4.3.2">
+<h3 data-number="4.3.2" class="anchored" data-anchor-id="imputing-missing-numerical-values"><span class="header-section-number">4.3.2</span> Imputing Missing Numerical Values</h3>
+<p>Imputation refers to the process of replacing missing or incomplete values in a dataset. This step is important to ensure the dataset is complete and suitable for analysis. A common approach is to substitute missing values with summary statistics, such as the mean, median, or mode. More advanced methods may involve regression or machine learning techniques, but simple imputation strategies are often sufficient for exploratory analysis.</p>
+<p>In the following example, the numeric vector <code>n</code> contains missing values. To impute these missing values using the median, we first compute the median with the <code>median()</code> function. The <code>na.rm = TRUE</code> option tells R to ignore the <code>NA</code> values when performing the calculation. Then, we use a logical index vector generated by <code>is.na()</code> to locate the missing values and replace them with the computed median.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span>  <span class="fu">c</span>(<span class="dv">123</span>, <span class="dv">210</span>, <span class="cn">NA</span>, <span class="dv">100</span>, <span class="dv">502</span>, <span class="cn">NA</span>, <span class="dv">103</span>, <span class="dv">240</span>)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">median</span>(n, <span class="at">na.rm=</span>T) </span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>m</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 166.5</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>n[<span class="fu">is.na</span>(n)] <span class="ot">&lt;-</span> m</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>n</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 123.0 210.0 166.5 100.0 502.0 166.5 103.0 240.0</code></pre>
+</div>
+</div>
+</section>
+<section id="imputing-missing-character-values" class="level3" data-number="4.3.3">
+<h3 data-number="4.3.3" class="anchored" data-anchor-id="imputing-missing-character-values"><span class="header-section-number">4.3.3</span> Imputing Missing Character Values</h3>
+<p>When dealing with character vectors, a common strategy for imputing missing values is to replace them with the most frequently occurring value. This approach helps maintain consistency and can be implemented using a few steps.</p>
+<p>Let’s start with a character vector that includes some missing values:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>c <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"A"</span>, <span class="cn">NA</span>, <span class="st">"C"</span>, <span class="st">"C"</span>, <span class="st">"A"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To determine the most frequent value, we use the <code>table()</code> function, which returns a frequency table of the non-missing values:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>tab <span class="ot">&lt;-</span> <span class="fu">table</span>(c)</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>tab</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>c
+A B C 
+3 1 2 </code></pre>
+</div>
+</div>
+<p>The output of the <code>table()</code> function is a named integer vector with the class <code>"table"</code>. It can be treated like a regular named vector, where the names represent the unique values in the original data, and the values indicate their frequencies. You can view the names using the <code>names()</code> function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(tab)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "A" "B" "C"</code></pre>
+</div>
+</div>
+<p>To identify the most frequent value, we first compute the maximum frequency using the <code>max()</code> function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>hf <span class="ot">&lt;-</span> <span class="fu">max</span>(tab)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next, we want to find which value in tab corresponds to this maximum frequency. This is done by comparing tab with hf, which gives a logical index vector:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>ind <span class="ot">&lt;-</span> tab <span class="sc">==</span> hf </span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>ind</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>c
+    A     B     C 
+ TRUE FALSE FALSE </code></pre>
+</div>
+</div>
+<p>We then use this index to extract the name (i.e., value) associated with the highest frequency:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>hf_c <span class="ot">&lt;-</span> <span class="fu">names</span>(tab)[ind]</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>hf_c</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "A"</code></pre>
+</div>
+</div>
+<p>Finally, we use <code>is.na()</code> to identify missing values in the original vector and replace them with <code>hf_c</code>, the most common value:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>c[<span class="fu">is.na</span>(c)] <span class="ot">=</span> hf_c</span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>c</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "A" "B" "A" "A" "C" "C" "A"</code></pre>
+</div>
+</div>
+<p>If there is a tie for the most frequent value, only the first one in the result will be used, which may depend on the internal ordering in R.</p>
+</section>
+</section>
+<section id="matrix-indexing" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="matrix-indexing"><span class="header-section-number">4.4</span> Matrix Indexing</h2>
+<p>The five types of index vectors can also be applied to matrices for selecting specific elements. Consider the following example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>, <span class="at">nrow=</span><span class="dv">3</span>)</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(m) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"i"</span>, <span class="st">"ii"</span>, <span class="st">"iii"</span>)</span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(m) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"I"</span>, <span class="st">"II"</span>, <span class="st">"III"</span>, <span class="st">"IV"</span>)</span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>m</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    I II III IV
+i   1  4   7 10
+ii  2  5   8 11
+iii 3  6   9 12</code></pre>
+</div>
+</div>
+<p>To extract elements from a matrix, two index vectors are placed inside square brackets, separated by a comma. The first index vector corresponds to the row positions, and the second to the column positions. For instance, the following command selects the element in the second row and fourth column:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>m[<span class="dv">2</span>,<span class="dv">4</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11</code></pre>
+</div>
+</div>
+<p>Leaving either the row or column position empty selects all values along that dimension. For example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>m[<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>),] <span class="do">## select first and third rows</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    I II III IV
+i   1  4   7 10
+iii 3  6   9 12</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>m[,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)] <span class="do">## select first and second columns</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    I II
+i   1  4
+ii  2  5
+iii 3  6</code></pre>
+</div>
+</div>
+<p>Different types of index vectors can be used at each index position. In the next example, a negative integer index excludes the first row, and a character index selects the columns named <code>"I"</code> and <code>"IV"</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>m[<span class="sc">-</span><span class="dv">1</span>, <span class="fu">c</span>(<span class="st">"I"</span>, <span class="st">"IV"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    I IV
+ii  2 11
+iii 3 12</code></pre>
+</div>
+</div>
+<p>In the following example, a character index is used to select rows with names <code>"i"</code> and <code>"ii"</code>, while a numeric index selects the second through fourth columns:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>m[<span class="fu">c</span>(<span class="st">"i"</span>, <span class="st">"ii"</span>), <span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   II III IV
+i   4   7 10
+ii  5   8 11</code></pre>
+</div>
+</div>
+</section>
+<section id="subsetting-data-frames" class="level2" data-number="4.5">
+<h2 data-number="4.5" class="anchored" data-anchor-id="subsetting-data-frames"><span class="header-section-number">4.5</span> Subsetting Data Frames</h2>
+<p>A data frame in R shares features with both matrices and lists. Therefore, subsetting a data frame can be done using one or two index vectors, depending on how the data frame is treated.</p>
+<section id="subsetting-a-data-frame-as-a-matrix" class="level3" data-number="4.5.1">
+<h3 data-number="4.5.1" class="anchored" data-anchor-id="subsetting-a-data-frame-as-a-matrix"><span class="header-section-number">4.5.1</span> Subsetting a Data Frame as a Matrix</h3>
+<p>When a data frame is treated like a matrix, two indices are required: the first index selects rows, and the second selects columns. For example, the following code selects the second and third rows from the data frame <code>d</code>, while retaining all columns:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">L =</span> <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>),</span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">M =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">N1 =</span> <span class="fu">c</span>(T, F, <span class="cn">NA</span>)</span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>d</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  L M    N1
+1 A 1  TRUE
+2 B 2 FALSE
+3 C 3    NA</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>d[<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>), ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  L M    N1
+2 B 2 FALSE
+3 C 3    NA</code></pre>
+</div>
+</div>
+<p>To select specific columns, you can use a column index in the second position. The following command selects the first and third columns, including all rows:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>d[,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  L    N1
+1 A  TRUE
+2 B FALSE
+3 C    NA</code></pre>
+</div>
+</div>
+<p>You can also use a logical index to subset rows. The expression <code>d$L == "A"</code> creates a logical vector that identifies which rows have the value <code>"A"</code> in column <code>L</code>. This logical index is placed before the comma to select the corresponding rows:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>d<span class="sc">$</span>L <span class="sc">==</span> <span class="st">"A"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  TRUE FALSE FALSE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>d[d<span class="sc">$</span>L <span class="sc">==</span> <span class="st">"A"</span>, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  L M   N1
+1 A 1 TRUE</code></pre>
+</div>
+</div>
+<p>Character indexing can be used to select columns by name. The following example selects the columns named <code>"M"</code> and <code>"N1"</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>d[, <span class="fu">c</span>(<span class="st">"M"</span>, <span class="st">"N1"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  M    N1
+1 1  TRUE
+2 2 FALSE
+3 3    NA</code></pre>
+</div>
+</div>
+<p>You can combine both row and column indexing. The example below selects rows where column <code>L</code> equals <code>"A"</code> and returns only the <code>"M"</code> and <code>"N1"</code> columns:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>d[d<span class="sc">$</span>L <span class="sc">==</span> <span class="st">"A"</span>, <span class="fu">c</span>(<span class="st">"M"</span>, <span class="st">"N1"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  M   N1
+1 1 TRUE</code></pre>
+</div>
+</div>
+</section>
+<section id="subsetting-a-data-frame-as-a-list" class="level3" data-number="4.5.2">
+<h3 data-number="4.5.2" class="anchored" data-anchor-id="subsetting-a-data-frame-as-a-list"><span class="header-section-number">4.5.2</span> Subsetting a Data Frame as a List</h3>
+<p>A data frame is also a special type of list, where each column is treated as a separate component. When subsetting a data frame as a list, you can only select columns—rows cannot be selected this way—and only a single index vector is used.</p>
+<p>For instance, you can use a numeric index vector to select the second and third columns:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>d[<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">3</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  M    N1
+1 1  TRUE
+2 2 FALSE
+3 3    NA</code></pre>
+</div>
+</div>
+<p>Alternatively, use a character index vector to select columns by name:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>d[<span class="fu">c</span>(<span class="st">"M"</span>, <span class="st">"N1"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  M    N1
+1 1  TRUE
+2 2 FALSE
+3 3    NA</code></pre>
+</div>
+</div>
+</section>
+<section id="sorting-a-data-frame" class="level3" data-number="4.5.3">
+<h3 data-number="4.5.3" class="anchored" data-anchor-id="sorting-a-data-frame"><span class="header-section-number">4.5.3</span> Sorting a Data Frame</h3>
+<p>To sort a vector in R, the <code>sort()</code> function can be used. By default, this function sorts values in ascending order. If you want to sort the vector in descending order, set the <code>decreasing=</code> option to TRUE:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">2</span>, <span class="dv">1</span>)</span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1 2 5</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sort</span>(x, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 5 2 1</code></pre>
+</div>
+</div>
+<p>Sorting a data frame involves arranging its rows using an index vector of positive integers. This index vector must match the number of rows in the data frame. Typically, the <code>order()</code> function is used to generate this index.</p>
+<p>The examples below make use of the <code>painters</code> dataset from the <code>MASS</code> package. This dataset includes subjective evaluations of 54 classical painters across four artistic dimensions: <code>Composition</code>, <code>Drawing</code>, <code>Colour</code>, and <code>Expression</code>. These evaluations were originally compiled by the 18th-century art critic, de Piles.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(painters)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 54  5</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(painters)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              Composition Drawing Colour Expression School
+Da Udine               10       8     16          3      A
+Da Vinci               15      16      4         14      A
+Del Piombo              8      13     16          7      A
+Del Sarto              12      16      9          8      A
+Fr. Penni               0      15      8          0      A
+Guilio Romano          15      16      4         14      A</code></pre>
+</div>
+</div>
+<p>The <code>School</code> variable in this dataset indicates the school each painter is associated with. To simplify the examples, we’ll extract a smaller subset of the data, <code>painters_ABC</code>, which includes only those painters whose schools are labeled <code>"A"</code>, <code>"B"</code>, or <code>"C"</code>. The <code>%in%</code> operator is used to compare each entry in the School variable against these three values and create a logical index.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>ABC_index <span class="ot">&lt;-</span> painters<span class="sc">$</span>School <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>)</span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>ABC_index</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+[13]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE FALSE
+[25] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[37] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+[49] FALSE FALSE FALSE FALSE FALSE FALSE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(ABC_index)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 22</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>painters_ABC <span class="ot">&lt;-</span> painters[ABC_index,]</span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(painters_ABC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 22  5</code></pre>
+</div>
+</div>
+<p>The first example shows how to sort <code>painters_ABC</code> by row names, which correspond to the painters’ names. The <code>order()</code> function returns an index that arranges the row names in ascending order. This index is then used to reorder the rows:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a>name_Index <span class="ot">&lt;-</span> <span class="fu">order</span>(<span class="fu">row.names</span>(painters_ABC))</span>
+<span id="cb111-2"><a href="#cb111-2" aria-hidden="true" tabindex="-1"></a>name_Index</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 17 18  1  2  3  4 11  5 12  6 19 20  7 13  8  9 14 10 15 21 22 16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>painters_ABC[name_Index, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                Composition Drawing Colour Expression School
+Barocci                  14      15      6         10      C
+Cortona                  16      14     12          6      C
+Da Udine                 10       8     16          3      A
+Da Vinci                 15      16      4         14      A
+Del Piombo                8      13     16          7      A
+Del Sarto                12      16      9          8      A
+F. Zucarro               10      13      8          8      B
+Fr. Penni                 0      15      8          0      A
+Fr. Salviata             13      15      8          8      B
+Guilio Romano            15      16      4         14      A
+Josepin                  10      10      6          2      C
+L. Jordaens              13      12      9          6      C
+Michelangelo              8      17      4          8      A
+Parmigiano               10      15      6          6      B
+Perino del Vaga          15      16      7          6      A
+Perugino                  4      12     10          4      A
+Primaticcio              15      14      7         10      B
+Raphael                  17      18     12         18      A
+T. Zucarro               13      14     10          9      B
+Testa                    11      15      0          6      C
+Vanius                   15      15     12         13      C
+Volterra                 12      15      5          8      B</code></pre>
+</div>
+</div>
+<p>The next example sorts the data by the <code>School</code> variable in descending order. Here, the <code>order()</code> function is placed directly inside the square brackets, and the <code>decreasing = TRUE</code> argument ensures descending order:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a>painters_ABC[<span class="fu">order</span>(painters_ABC<span class="sc">$</span>School, <span class="at">decreasing =</span> T), ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                Composition Drawing Colour Expression School
+Barocci                  14      15      6         10      C
+Cortona                  16      14     12          6      C
+Josepin                  10      10      6          2      C
+L. Jordaens              13      12      9          6      C
+Testa                    11      15      0          6      C
+Vanius                   15      15     12         13      C
+F. Zucarro               10      13      8          8      B
+Fr. Salviata             13      15      8          8      B
+Parmigiano               10      15      6          6      B
+Primaticcio              15      14      7         10      B
+T. Zucarro               13      14     10          9      B
+Volterra                 12      15      5          8      B
+Da Udine                 10       8     16          3      A
+Da Vinci                 15      16      4         14      A
+Del Piombo                8      13     16          7      A
+Del Sarto                12      16      9          8      A
+Fr. Penni                 0      15      8          0      A
+Guilio Romano            15      16      4         14      A
+Michelangelo              8      17      4          8      A
+Perino del Vaga          15      16      7          6      A
+Perugino                  4      12     10          4      A
+Raphael                  17      18     12         18      A</code></pre>
+</div>
+</div>
+<p>You can also sort a data frame by more than one variable. The following command sorts by <code>School</code>, then by <code>Drawing</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a>painters_ABC[<span class="fu">order</span>(painters_ABC<span class="sc">$</span>School, </span>
+<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a>                   painters_ABC<span class="sc">$</span>Drawing), ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                Composition Drawing Colour Expression School
+Da Udine                 10       8     16          3      A
+Perugino                  4      12     10          4      A
+Del Piombo                8      13     16          7      A
+Fr. Penni                 0      15      8          0      A
+Da Vinci                 15      16      4         14      A
+Del Sarto                12      16      9          8      A
+Guilio Romano            15      16      4         14      A
+Perino del Vaga          15      16      7          6      A
+Michelangelo              8      17      4          8      A
+Raphael                  17      18     12         18      A
+F. Zucarro               10      13      8          8      B
+Primaticcio              15      14      7         10      B
+T. Zucarro               13      14     10          9      B
+Fr. Salviata             13      15      8          8      B
+Parmigiano               10      15      6          6      B
+Volterra                 12      15      5          8      B
+Josepin                  10      10      6          2      C
+L. Jordaens              13      12      9          6      C
+Cortona                  16      14     12          6      C
+Barocci                  14      15      6         10      C
+Testa                    11      15      0          6      C
+Vanius                   15      15     12         13      C</code></pre>
+</div>
+</div>
+<p>If you specify <code>decreasing = TRUE</code>, the sorting is applied in descending order for all variables listed:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a>painters_ABC[<span class="fu">order</span>(painters_ABC<span class="sc">$</span>School, </span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>                   painters_ABC<span class="sc">$</span>Colour,    </span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a>                   painters_ABC<span class="sc">$</span>Drawing, </span>
+<span id="cb119-4"><a href="#cb119-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">decreasing =</span> T),]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                Composition Drawing Colour Expression School
+Vanius                   15      15     12         13      C
+Cortona                  16      14     12          6      C
+L. Jordaens              13      12      9          6      C
+Barocci                  14      15      6         10      C
+Josepin                  10      10      6          2      C
+Testa                    11      15      0          6      C
+T. Zucarro               13      14     10          9      B
+Fr. Salviata             13      15      8          8      B
+F. Zucarro               10      13      8          8      B
+Primaticcio              15      14      7         10      B
+Parmigiano               10      15      6          6      B
+Volterra                 12      15      5          8      B
+Del Piombo                8      13     16          7      A
+Da Udine                 10       8     16          3      A
+Raphael                  17      18     12         18      A
+Perugino                  4      12     10          4      A
+Del Sarto                12      16      9          8      A
+Fr. Penni                 0      15      8          0      A
+Perino del Vaga          15      16      7          6      A
+Michelangelo              8      17      4          8      A
+Da Vinci                 15      16      4         14      A
+Guilio Romano            15      16      4         14      A</code></pre>
+</div>
+</div>
+<p>To selectively sort one of the numeric variables in descending order, you can prefix it with a minus sign (<code>-</code>). For example, this command sorts by <code>School</code>, then by decreasing <code>Colour</code>, and finally by <code>Drawing</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a>painters_ABC[<span class="fu">order</span>(painters_ABC<span class="sc">$</span>School, </span>
+<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a>                   <span class="sc">-</span>painters_ABC<span class="sc">$</span>Colour, </span>
+<span id="cb121-3"><a href="#cb121-3" aria-hidden="true" tabindex="-1"></a>                   painters_ABC<span class="sc">$</span>Drawing), ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                Composition Drawing Colour Expression School
+Da Udine                 10       8     16          3      A
+Del Piombo                8      13     16          7      A
+Raphael                  17      18     12         18      A
+Perugino                  4      12     10          4      A
+Del Sarto                12      16      9          8      A
+Fr. Penni                 0      15      8          0      A
+Perino del Vaga          15      16      7          6      A
+Da Vinci                 15      16      4         14      A
+Guilio Romano            15      16      4         14      A
+Michelangelo              8      17      4          8      A
+T. Zucarro               13      14     10          9      B
+F. Zucarro               10      13      8          8      B
+Fr. Salviata             13      15      8          8      B
+Primaticcio              15      14      7         10      B
+Parmigiano               10      15      6          6      B
+Volterra                 12      15      5          8      B
+Cortona                  16      14     12          6      C
+Vanius                   15      15     12         13      C
+L. Jordaens              13      12      9          6      C
+Josepin                  10      10      6          2      C
+Barocci                  14      15      6         10      C
+Testa                    11      15      0          6      C</code></pre>
+</div>
+</div>
+<p>When working with character variables, the minus sign cannot be applied directly. Instead, use the <code>xtfrm()</code> function, which transforms the character variable into a numeric form that preserves the original sort order. This allows descending sorting for character data:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb123"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a><span class="fu">xtfrm</span>(<span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"D"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1 4 2 3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb125"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true" tabindex="-1"></a>painters_ABC[<span class="fu">order</span>(<span class="sc">-</span><span class="fu">xtfrm</span>(painters_ABC<span class="sc">$</span>School),</span>
+<span id="cb125-2"><a href="#cb125-2" aria-hidden="true" tabindex="-1"></a>                   painters_ABC<span class="sc">$</span>Drawing), ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                Composition Drawing Colour Expression School
+Josepin                  10      10      6          2      C
+L. Jordaens              13      12      9          6      C
+Cortona                  16      14     12          6      C
+Barocci                  14      15      6         10      C
+Testa                    11      15      0          6      C
+Vanius                   15      15     12         13      C
+F. Zucarro               10      13      8          8      B
+Primaticcio              15      14      7         10      B
+T. Zucarro               13      14     10          9      B
+Fr. Salviata             13      15      8          8      B
+Parmigiano               10      15      6          6      B
+Volterra                 12      15      5          8      B
+Da Udine                 10       8     16          3      A
+Perugino                  4      12     10          4      A
+Del Piombo                8      13     16          7      A
+Fr. Penni                 0      15      8          0      A
+Da Vinci                 15      16      4         14      A
+Del Sarto                12      16      9          8      A
+Guilio Romano            15      16      4         14      A
+Perino del Vaga          15      16      7          6      A
+Michelangelo              8      17      4          8      A
+Raphael                  17      18     12         18      A</code></pre>
+</div>
+</div>
+<p>By default, missing values (<code>NA</code>) are placed at the end of the sorted result. To move missing values to the beginning, set <code>na.last = FALSE</code>. To remove rows with missing values from the sort entirely, use <code>na.last = NA</code>.</p>
+</section>
+</section>
+<section id="the-differences-between-and" class="level2" data-number="4.6">
+<h2 data-number="4.6" class="anchored" data-anchor-id="the-differences-between-and"><span class="header-section-number">4.6</span> The Differences Between <code>[</code>, <code>[[</code>, and <code>$</code></h2>
+<p>R provides three operators—<code>[</code>, <code>[[</code>, and <code>$</code>—for subsetting objects. The choice of which operator to use depends on the type of object and the form of the result you want. Understanding the distinctions between these operators is important for writing clear and predictable code.</p>
+<section id="selecting-a-single-column-from-a-data-frame" class="level3" data-number="4.6.1">
+<h3 data-number="4.6.1" class="anchored" data-anchor-id="selecting-a-single-column-from-a-data-frame"><span class="header-section-number">4.6.1</span> Selecting a Single Column from a Data Frame</h3>
+<p>When you use <code>[</code> to select a single column from a data frame, the result is still a data frame:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb127"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a>d</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  L M    N1
+1 A 1  TRUE
+2 B 2 FALSE
+3 C 3    NA</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb129"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb129-1"><a href="#cb129-1" aria-hidden="true" tabindex="-1"></a>d[<span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     N1
+1  TRUE
+2 FALSE
+3    NA</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb131"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb131-1"><a href="#cb131-1" aria-hidden="true" tabindex="-1"></a>d[<span class="st">"N1"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     N1
+1  TRUE
+2 FALSE
+3    NA</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb133"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb133-1"><a href="#cb133-1" aria-hidden="true" tabindex="-1"></a>d[<span class="sc">-</span><span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     N1
+1  TRUE
+2 FALSE
+3    NA</code></pre>
+</div>
+</div>
+<p>In contrast, using <code>[[</code> returns a vector instead of a data frame:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb135"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true" tabindex="-1"></a>d[[<span class="dv">3</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  TRUE FALSE    NA</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb137"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a>d[[<span class="st">"N1"</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  TRUE FALSE    NA</code></pre>
+</div>
+</div>
+<p>Similarly, the <code>$</code> operator also returns a vector:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb139"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a>d<span class="sc">$</span>N1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  TRUE FALSE    NA</code></pre>
+</div>
+</div>
+</section>
+<section id="selecting-one-or-several-components-from-an-object" class="level3" data-number="4.6.2">
+<h3 data-number="4.6.2" class="anchored" data-anchor-id="selecting-one-or-several-components-from-an-object"><span class="header-section-number">4.6.2</span> Selecting One or Several Components from an Object</h3>
+<p>The <code>[</code> operator allows selection of multiple components (e.g., multiple columns from a data frame). However, both <code>[[</code> and <code>$</code> can be used to select only a single element at a time. For example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb141"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a>d[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  L M
+1 A 1
+2 B 2
+3 C 3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb143"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb143-1"><a href="#cb143-1" aria-hidden="true" tabindex="-1"></a>d[<span class="sc">-</span><span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  L M
+1 A 1
+2 B 2
+3 C 3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb145"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true" tabindex="-1"></a>d[<span class="fu">c</span>(<span class="st">"L"</span>, <span class="st">"M"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  L M
+1 A 1
+2 B 2
+3 C 3</code></pre>
+</div>
+</div>
+<p>This rule applies not only to data frames but also to other list-like objects.</p>
+</section>
+<section id="using-operators-for-evaluations" class="level3" data-number="4.6.3">
+<h3 data-number="4.6.3" class="anchored" data-anchor-id="using-operators-for-evaluations"><span class="header-section-number">4.6.3</span> Using Operators for Evaluations</h3>
+<p>The <code>[[</code> and <code>[</code> operators evaluate their arguments, meaning you can pass in expressions. For instance:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb147"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb147-1"><a href="#cb147-1" aria-hidden="true" tabindex="-1"></a>d[[<span class="dv">1</span><span class="sc">+</span><span class="dv">2</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  TRUE FALSE    NA</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb149"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb149-1"><a href="#cb149-1" aria-hidden="true" tabindex="-1"></a>d[<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)<span class="sc">+</span><span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  M    N1
+1 1  TRUE
+2 2 FALSE
+3 3    NA</code></pre>
+</div>
+</div>
+<p>In contrast, the <code>$</code> operator does not evaluate its argument. It expects a literal column name. As a result, the following will not work:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb151"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb151-1"><a href="#cb151-1" aria-hidden="true" tabindex="-1"></a>d<span class="sc">$</span><span class="dv">1</span> <span class="sc">+</span> <span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>Error in parse(text = input): &lt;text&gt;:1:3: unexpected numeric constant
+1: d$1
+      ^</code></pre>
+</div>
+</div>
+</section>
+<section id="partial-matching" class="level3" data-number="4.6.4">
+<h3 data-number="4.6.4" class="anchored" data-anchor-id="partial-matching"><span class="header-section-number">4.6.4</span> Partial Matching</h3>
+<p>The <code>$</code> operator allows for partial matching of column names, whereas <code>[</code> and <code>[[</code> do not. In the example below, the column <code>N1</code> is returned even though only <code>N</code> is specified:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb153"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb153-1"><a href="#cb153-1" aria-hidden="true" tabindex="-1"></a>d<span class="sc">$</span>N</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  TRUE FALSE    NA</code></pre>
+</div>
+</div>
+<p>While partial matching can be convenient, it is generally discouraged. Using full, explicit names makes your code easier to understand and less error-prone.</p>
+</section>
+</section>
+<section id="simplifying-and-preserving" class="level2" data-number="4.7">
+<h2 data-number="4.7" class="anchored" data-anchor-id="simplifying-and-preserving"><span class="header-section-number">4.7</span> Simplifying and Preserving</h2>
+<p>This section is based in part on <em>Advanced R</em> by Hadley Wickham (2nd ed., <a href="https://adv-r.hadley.nz/subsetting.html" class="uri">https://adv-r.hadley.nz/subsetting.html</a>)<span class="citation" data-cites="wickham2019advanced">(<a href="#ref-wickham2019advanced" role="doc-biblioref">Wickham 2019</a>)</span>, which provides an in-depth treatment of how subsetting can return either simplified or preserved structures in R.</p>
+<p>When you subset an object, the result may not always retain the original structure. Simplifying subsets return the most compact possible result (e.g., a vector instead of a data frame), while preserving subsets maintain the structure of the original object. Choosing between them depends on your analysis goals—whether you want simplicity or consistency in data type.</p>
+<section id="simplifying-and-preserving-vectors" class="level3" data-number="4.7.1">
+<h3 data-number="4.7.1" class="anchored" data-anchor-id="simplifying-and-preserving-vectors"><span class="header-section-number">4.7.1</span> Simplifying and Preserving: Vectors</h3>
+<p>Let’s consider a named vector. Using double brackets <code>[[</code> simplifies the output by removing additional attributes like names. On the other hand, using single brackets <code>[</code> preserves these attributes and returns a subset of the same type.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb155"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb155-1"><a href="#cb155-1" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span></span>
+<span id="cb155-2"><a href="#cb155-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(v) <span class="ot">&lt;-</span> letters[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb155-3"><a href="#cb155-3" aria-hidden="true" tabindex="-1"></a>v</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>a b c d e 
+1 2 3 4 5 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb157"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a>v[[<span class="dv">1</span>]] <span class="do">## Simplified output, no names</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb159"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb159-1"><a href="#cb159-1" aria-hidden="true" tabindex="-1"></a>v[<span class="dv">1</span>]   <span class="do">## Preserved output, names retained</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>a 
+1 </code></pre>
+</div>
+</div>
+</section>
+<section id="simplifying-and-preserving-factors" class="level3" data-number="4.7.2">
+<h3 data-number="4.7.2" class="anchored" data-anchor-id="simplifying-and-preserving-factors"><span class="header-section-number">4.7.2</span> Simplifying and Preserving: Factors</h3>
+<p>When extracting elements from a factor, simplification means dropping unused levels. This is done by setting <code>drop = TRUE</code>, which is the default. Preservation retains all original levels, even if they are not present in the subset.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb161"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb161-1"><a href="#cb161-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>))</span>
+<span id="cb161-2"><a href="#cb161-2" aria-hidden="true" tabindex="-1"></a>f</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] A B C
+Levels: A B C</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb163"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb163-1"><a href="#cb163-1" aria-hidden="true" tabindex="-1"></a>f[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, drop<span class="ot">=</span>T]  <span class="do">## Simplified: unused levels dropped</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] A B
+Levels: A B</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb165"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb165-1"><a href="#cb165-1" aria-hidden="true" tabindex="-1"></a>f[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]          <span class="do">## Preserved: all levels retained</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] A B
+Levels: A B C</code></pre>
+</div>
+</div>
+</section>
+<section id="simplifying-and-preserving-matrices" class="level3" data-number="4.7.3">
+<h3 data-number="4.7.3" class="anchored" data-anchor-id="simplifying-and-preserving-matrices"><span class="header-section-number">4.7.3</span> Simplifying and Preserving: Matrices</h3>
+<p>In matrix subsetting, selecting a single row or column can return a simplified result (a vector). To retain the matrix structure, set <code>drop = FALSE</code> to preserve the two-dimensional format.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb167"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb167-1"><a href="#cb167-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">2</span>)</span>
+<span id="cb167-2"><a href="#cb167-2" aria-hidden="true" tabindex="-1"></a>m</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1] [,2]
+[1,]    1    3
+[2,]    2    4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb169"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb169-1"><a href="#cb169-1" aria-hidden="true" tabindex="-1"></a>m[, <span class="dv">1</span>]                <span class="do">## Simplified: returns a vector</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1 2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb171"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb171-1"><a href="#cb171-1" aria-hidden="true" tabindex="-1"></a>m[<span class="dv">1</span>, ]                <span class="do">### Simplified: returns a vector</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1 3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb173"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb173-1"><a href="#cb173-1" aria-hidden="true" tabindex="-1"></a>m[, <span class="dv">1</span>, drop <span class="ot">=</span> <span class="cn">FALSE</span>]  <span class="do">## Preserved: still a matrix</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1]
+[1,]    1
+[2,]    2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb175"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb175-1"><a href="#cb175-1" aria-hidden="true" tabindex="-1"></a>m[<span class="dv">1</span>, , drop <span class="ot">=</span> <span class="cn">FALSE</span>]  <span class="co"># Preserved: still a matrix</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1] [,2]
+[1,]    1    3</code></pre>
+</div>
+</div>
+</section>
+<section id="simplifying-and-preserving-lists" class="level3" data-number="4.7.4">
+<h3 data-number="4.7.4" class="anchored" data-anchor-id="simplifying-and-preserving-lists"><span class="header-section-number">4.7.4</span> Simplifying and Preserving: Lists</h3>
+<p>For lists, double brackets <code>[[</code> return the internal object directly (e.g., a vector or string), whereas single brackets <code>[</code> return a sublist, preserving the list structure.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb177"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb177-1"><a href="#cb177-1" aria-hidden="true" tabindex="-1"></a>l <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">a =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="at">b =</span> <span class="st">"A"</span>)</span>
+<span id="cb177-2"><a href="#cb177-2" aria-hidden="true" tabindex="-1"></a>l</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$a
+[1] 1 2 3
+
+$b
+[1] "A"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb179"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb179-1"><a href="#cb179-1" aria-hidden="true" tabindex="-1"></a>l[[<span class="dv">1</span>]]  <span class="do">## Simplifying</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1 2 3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb181"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb181-1"><a href="#cb181-1" aria-hidden="true" tabindex="-1"></a>l[<span class="dv">1</span>]    <span class="do">## Preserving</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$a
+[1] 1 2 3</code></pre>
+</div>
+</div>
+</section>
+<section id="simplifying-and-preserving-data-frames" class="level3" data-number="4.7.5">
+<h3 data-number="4.7.5" class="anchored" data-anchor-id="simplifying-and-preserving-data-frames"><span class="header-section-number">4.7.5</span> Simplifying and Preserving: Data Frames</h3>
+<p>A data frame in R can behave either like a matrix or like a list. Depending on how you subset it, the result may either simplify to a vector or preserve the original data frame structure. Below, we illustrate both behaviors.</p>
+<p><strong>Treating a Data Frame as a Matrix</strong></p>
+<p>When using the single bracket operator <code>[</code> with two indices — the first for rows and the second for columns — R treats the data frame like a matrix. Selecting a single column in this way returns a simplified result: a vector.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb183"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb183-1"><a href="#cb183-1" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span>  <span class="fu">data.frame</span>(</span>
+<span id="cb183-2"><a href="#cb183-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">V1 =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb183-3"><a href="#cb183-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">V2 =</span> letters[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>],</span>
+<span id="cb183-4"><a href="#cb183-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">V3 =</span> <span class="fu">c</span>(T, T, F)</span>
+<span id="cb183-5"><a href="#cb183-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb183-6"><a href="#cb183-6" aria-hidden="true" tabindex="-1"></a>d</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  V1 V2    V3
+1  1  a  TRUE
+2  2  b  TRUE
+3  3  c FALSE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb185"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb185-1"><a href="#cb185-1" aria-hidden="true" tabindex="-1"></a>d[, <span class="dv">2</span>]         <span class="do">## Simplifying – returns a vector</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "a" "b" "c"</code></pre>
+</div>
+</div>
+<p>To preserve the data frame structure when selecting one column, use the <code>drop = FALSE</code> option:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb187"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb187-1"><a href="#cb187-1" aria-hidden="true" tabindex="-1"></a>d[, <span class="dv">2</span>, drop <span class="ot">=</span> <span class="cn">FALSE</span>]  <span class="do">## Preserving – returns a one-column data frame</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  V2
+1  a
+2  b
+3  c</code></pre>
+</div>
+</div>
+<p><strong>Treating a Data Frame as a List</strong></p>
+<p>Alternatively, you can treat a data frame as a list, where each column is a component of the list. In this case, using double brackets <code>[[</code> extracts a single component and simplifies the result:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb189"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb189-1"><a href="#cb189-1" aria-hidden="true" tabindex="-1"></a>d[[<span class="dv">2</span>]]   <span class="do">## Simplifying – returns a vector</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "a" "b" "c"</code></pre>
+</div>
+</div>
+<p>Using single brackets <code>[</code> with a numeric or character vector returns a sub-list, which preserves the data frame structure:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb191"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb191-1"><a href="#cb191-1" aria-hidden="true" tabindex="-1"></a>d[<span class="dv">2</span>]     <span class="do">## Preserving – returns a one-column data frame</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  V2
+1  a
+2  b
+3  c</code></pre>
+</div>
+</div>
+<p>This distinction between matrix-style and list-style subsetting is important when you want to control the structure of the output — whether you need a simple vector or wish to retain the data frame format for further processing.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-wickham2019advanced" class="csl-entry" role="listitem">
+Wickham, Hadley. 2019. <em>Advanced r</em>. 2nd ed. CRC Press. <a href="https://adv-r.hadley.nz/">https://adv-r.hadley.nz/</a>.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./objects2.html" class="pagination-link" aria-label="Objects - Lists and Data Frames">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Objects - Lists and Data Frames</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./functions.html" class="pagination-link" aria-label="Writing User-Defined Functions">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Writing User-Defined Functions</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

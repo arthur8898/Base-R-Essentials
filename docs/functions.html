@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>5&nbsp; Writing User-Defined Functions – Base R Essentials</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./iteration.html" rel="next">
+<link href="./Subsetting.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./functions.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Writing User-Defined Functions</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Base R Essentials</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Getting Started with Base R</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./objects1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Objects - Vectors, Matrices, and Arrays</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./objects2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Objects - Lists and Data Frames</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Subsetting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Subsetting Objects</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./functions.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Writing User-Defined Functions</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./iteration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Iteration</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#creating-your-own-functions" id="toc-creating-your-own-functions" class="nav-link active" data-scroll-target="#creating-your-own-functions"><span class="header-section-number">5.1</span> Creating Your Own Functions</a>
+  <ul class="collapse">
+  <li><a href="#why-write-a-function" id="toc-why-write-a-function" class="nav-link" data-scroll-target="#why-write-a-function"><span class="header-section-number">5.1.1</span> Why Write a Function?</a></li>
+  <li><a href="#turning-code-into-a-function" id="toc-turning-code-into-a-function" class="nav-link" data-scroll-target="#turning-code-into-a-function"><span class="header-section-number">5.1.2</span> Turning Code into a Function</a></li>
+  <li><a href="#return-values" id="toc-return-values" class="nav-link" data-scroll-target="#return-values"><span class="header-section-number">5.1.3</span> Return Values</a></li>
+  </ul></li>
+  <li><a href="#execution-order-in-functions" id="toc-execution-order-in-functions" class="nav-link" data-scroll-target="#execution-order-in-functions"><span class="header-section-number">5.2</span> Execution Order in Functions</a>
+  <ul class="collapse">
+  <li><a href="#sequential-execution-with-simple-calculations" id="toc-sequential-execution-with-simple-calculations" class="nav-link" data-scroll-target="#sequential-execution-with-simple-calculations"><span class="header-section-number">5.2.1</span> Sequential Execution with Simple Calculations</a></li>
+  <li><a href="#application-imputing-numeric-variables" id="toc-application-imputing-numeric-variables" class="nav-link" data-scroll-target="#application-imputing-numeric-variables"><span class="header-section-number">5.2.2</span> Application: Imputing Numeric Variables</a></li>
+  <li><a href="#application-imputing-character-variables" id="toc-application-imputing-character-variables" class="nav-link" data-scroll-target="#application-imputing-character-variables"><span class="header-section-number">5.2.3</span> Application: Imputing Character Variables</a></li>
+  </ul></li>
+  <li><a href="#function-parameters" id="toc-function-parameters" class="nav-link" data-scroll-target="#function-parameters"><span class="header-section-number">5.3</span> Function Parameters</a>
+  <ul class="collapse">
+  <li><a href="#matching-arguments-to-parameters" id="toc-matching-arguments-to-parameters" class="nav-link" data-scroll-target="#matching-arguments-to-parameters"><span class="header-section-number">5.3.1</span> Matching Arguments to Parameters</a></li>
+  <li><a href="#default-arguments" id="toc-default-arguments" class="nav-link" data-scroll-target="#default-arguments"><span class="header-section-number">5.3.2</span> Default Arguments</a></li>
+  <li><a href="#why-use-instead-of" id="toc-why-use-instead-of" class="nav-link" data-scroll-target="#why-use-instead-of"><span class="header-section-number">5.3.3</span> Why Use [[ Instead of $?</a></li>
+  <li><a href="#parameterless-functions" id="toc-parameterless-functions" class="nav-link" data-scroll-target="#parameterless-functions"><span class="header-section-number">5.3.4</span> Parameterless Functions</a></li>
+  </ul></li>
+  <li><a href="#condition-logic" id="toc-condition-logic" class="nav-link" data-scroll-target="#condition-logic"><span class="header-section-number">5.4</span> Condition Logic</a>
+  <ul class="collapse">
+  <li><a href="#the-if-statement" id="toc-the-if-statement" class="nav-link" data-scroll-target="#the-if-statement"><span class="header-section-number">5.4.1</span> The <code>if</code> Statement</a></li>
+  <li><a href="#logical-operators" id="toc-logical-operators" class="nav-link" data-scroll-target="#logical-operators"><span class="header-section-number">5.4.2</span> Logical Operators</a></li>
+  <li><a href="#application-print-customized-message" id="toc-application-print-customized-message" class="nav-link" data-scroll-target="#application-print-customized-message"><span class="header-section-number">5.4.3</span> Application: Print Customized Message</a></li>
+  <li><a href="#application-the-impute-function" id="toc-application-the-impute-function" class="nav-link" data-scroll-target="#application-the-impute-function"><span class="header-section-number">5.4.4</span> Application: The <code>impute()</code> Function</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Writing User-Defined Functions</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Like most modern programming languages, R allows users to define their own functions. This capability is essential for creating reusable code and organizing complex tasks into manageable steps. Developing the skill to write user-defined functions is a key part of becoming a proficient R programmer. In this chapter, we will introduce the basic structure of a function in R, explain its components, and provide examples that illustrate how custom functions can simplify repetitive tasks.</p>
+<section id="creating-your-own-functions" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="creating-your-own-functions"><span class="header-section-number">5.1</span> Creating Your Own Functions</h2>
+<p>This section introduces the motivation for writing functions and explains how to create them step by step. We begin with a practical example to show when a function is useful, then walk through the process of converting a sequence of R commands into a well-structured function. Along the way, we will highlight key concepts such as input arguments, return values, and testing your function for reliability. Writing your own functions is an essential skill for producing clean, reusable, and scalable R code.</p>
+<section id="why-write-a-function" class="level3" data-number="5.1.1">
+<h3 data-number="5.1.1" class="anchored" data-anchor-id="why-write-a-function"><span class="header-section-number">5.1.1</span> Why Write a Function?</h3>
+<p>In R, we often find ourselves performing the same task multiple times—such as cleaning data, performing calculations, or creating plots. If the same block of code is used repeatedly with only slight changes, it becomes a good candidate for turning into a function. Writing a function allows us to package that code into a single, reusable unit.</p>
+<p>There are several advantages to writing your own functions:</p>
+<ul>
+<li><strong>Clarity</strong>: A well-named function helps explain what the code does, making your script easier to read and understand.</li>
+<li><strong>Efficiency</strong>: Once a function is defined, you can call it with different inputs as needed, instead of copying and modifying code manually.</li>
+<li><strong>Maintainability</strong>: If you need to make changes, you only have to update the code in one place.</li>
+<li><strong>Error reduction</strong>: Using functions helps avoid small but hard-to-spot mistakes that often come from copying and pasting similar code blocks.</li>
+<li><strong>Modularity</strong>: Even if a task isn’t repeated, wrapping related commands into a function can help organize your code into logical sections. This makes it easier to manage, test, and reuse in future projects.</li>
+</ul>
+<p>For example, Suppose we have the following vector:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>v1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="cn">NA</span>, <span class="dv">15</span>, <span class="dv">20</span>, <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we want to compute a few summary statistics, including mean, standard deviation, number of missing values, and then print the results in a readable format. Here is how we might write the code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Mean <span class="ot">&lt;-</span> <span class="fu">mean</span>(v1, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>SD <span class="ot">&lt;-</span> <span class="fu">sd</span>(v1, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>n_missing <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(v1))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mean:"</span>, Mean, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean: 30 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Standard Deviation:"</span>, SD, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Standard Deviation: 39.52847 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of Missing Values:"</span>, n_missing, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of Missing Values: 1 </code></pre>
+</div>
+</div>
+<p>The <code>cat()</code> function, short for concatenate and print, is used here to display all three results together in a readable format. It can take a varied number of arguments, each of which can be a constant (quoted text), a variable, or a special character like <code>"\n"</code> (for a new line). All arguments are printed in the order they appear and, by default, are separated by a single space. The <code>"\n"</code> tells R to move to a new line so that each printed value appears neatly on its own line.</p>
+<p>For example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"The value of x is"</span>, x, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>The value of x is 10 </code></pre>
+</div>
+</div>
+<p>In the code above, <code>cat()</code> is used to combine static labels (<code>"Mean:", "Standard Deviation:"</code>, etc.) with the corresponding computed values. This makes the output easier to read when the function is run.</p>
+<p>This approach works well, but if we want to apply the same steps to many different vectors, it becomes repetitive and harder to manage.</p>
+</section>
+<section id="turning-code-into-a-function" class="level3" data-number="5.1.2">
+<h3 data-number="5.1.2" class="anchored" data-anchor-id="turning-code-into-a-function"><span class="header-section-number">5.1.2</span> Turning Code into a Function</h3>
+<p>When we write a function, we are building a small machine. This machine takes input, performs a sequence of operations, and produces output. Just like a vending machine accepts a selection and returns a snack, an R function accepts an argument, performs some computations, and either returns a result or carries out an action. Not all functions need to return a value. In our example, the function simply computes summary statistics and prints them, rather than returning them to be stored or reused.</p>
+<p><strong>Function Syntax</strong></p>
+<p>The general structure of a user-defined function is as follows:</p>
+<pre><code>function_name &lt;- function(parameter1, parameter2, ...) {
+  # code block
+  # the final line is usually the value returned
+}</code></pre>
+<ul>
+<li><code>function_name</code> is the name you assign to your function</li>
+<li>Inside the parentheses, you define <strong>parameters</strong>—these are placeholders for the input values</li>
+<li>The curly braces <code>{}</code> contain the <strong>function body</strong>—this is the code that runs when the function is called</li>
+<li>When you later <strong>call</strong> the function and pass in specific values, those values are called <strong>arguments</strong></li>
+</ul>
+<p>This basic structure is described in many R references, including <em>R for Data Science</em> <span class="citation" data-cites="wickham2023r">(<a href="#ref-wickham2023r" role="doc-biblioref">Wickham, Çetinkaya-Rundel, and Grolemund 2023</a>)</span>, which offers a practical introduction to writing clear, reusable functions in real-world analysis workflows.</p>
+<p><strong>Step-by-Step: Turning Code into a Function</strong></p>
+<p>Let’s return to the example from the previous section. We want to compute a few summary statistics, and then print the results. The previous code works well, but if we want to repeat these steps for several different vectors, it becomes repetitive. Instead, we can turn it into a function that takes any numeric vector as input and returns the cleaned result.</p>
+<p><em>Step 1: Choose a Function Name and Parameter</em></p>
+<p>We’ll name the function <code>summarize_vector</code>. To decide what should become the parameter, we look back at the original code:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>Mean <span class="ot">&lt;-</span> <span class="fu">mean</span>(v1, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>SD <span class="ot">&lt;-</span> <span class="fu">sd</span>(v1, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>n_missing <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(v1))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mean:"</span>, Mean, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean: 30 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Standard Deviation:"</span>, SD, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Standard Deviation: 39.52847 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of Missing Values:"</span>, n_missing, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of Missing Values: 1 </code></pre>
+</div>
+</div>
+<p>In this code, the object <code>v1</code> appears multiple times. It’s used to calculate the mean, the standard deviation, and the number of missing values. This repetition suggests that <code>v1</code> is the natural input to the function—it’s the part that changes when we want to analyze a different vector.</p>
+<p>To make the code reusable, we generalize <code>v1</code> to a parameter called <code>x</code>. Later, when we call the function, we can pass any numeric vector to <code>x</code>.</p>
+<p>Before turning this into a full function, it’s a good idea to test whether your edits work. One simple way to do this is to assign <code>v1</code> to a new variable <code>x</code>, then manually replace all instances of <code>v1</code> with <code>x</code> in your code. This lets you verify that your logic still works with the parameter name you’ll use inside the function. For example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> v1    <span class="do">## parameter &lt;- argument</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>Mean <span class="ot">&lt;-</span> <span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)  <span class="co"># replace v1 with x</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>SD <span class="ot">&lt;-</span> <span class="fu">sd</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)      <span class="co"># replace v1 with x</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>n_missing <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(x))     <span class="co"># replace v1 with x</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Mean:"</span>, Mean, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean: 30 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Standard Deviation:"</span>, SD, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Standard Deviation: 39.52847 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of Missing Values:"</span>, n_missing, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of Missing Values: 1 </code></pre>
+</div>
+</div>
+<p>If this modified version runs correctly, you’re ready to move on to the next step—placing the code into a function definition.</p>
+<p><em>Step 2: Move the Code into the Function Body</em></p>
+<p>Next, we place the modified code into the function definition. The input vector <code>x</code> is now the function’s parameter, and everything inside the curly braces <code>{}</code> becomes the body of the function. This is the set of instructions that will be executed whenever the function is called.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>summarize_vector <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  Mean <span class="ot">&lt;-</span> <span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  SD <span class="ot">&lt;-</span> <span class="fu">sd</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  n_missing <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(x))</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Mean:"</span>, Mean, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Standard Deviation:"</span>, SD, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Number of Missing Values:"</span>, n_missing, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>At this point, the function is ready to use. We’ve made the code self-contained and reusable by identifying the input (<code>x</code>) and wrapping the logic inside a clearly named function.</p>
+<p><em>Step 3: Call the Function with Different Arguments</em></p>
+<p>Now that the function is defined, we can reuse it on any numeric vector by supplying an argument to the parameter <code>x</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize_vector</span>(v1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean: 30 
+Standard Deviation: 39.52847 
+Number of Missing Values: 1 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize_vector</span>(<span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="cn">NA</span>, <span class="dv">8</span>, <span class="dv">10</span>, <span class="cn">NA</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean: 6 
+Standard Deviation: 3.162278 
+Number of Missing Values: 2 </code></pre>
+</div>
+</div>
+<p>Each time we call the function, the argument we provide replaces the parameter <code>x</code> inside the function body. The same block of code runs, but it operates on the new data we supplied—saving time and reducing errors compared to copying and pasting the same code repeatedly.</p>
+</section>
+<section id="return-values" class="level3" data-number="5.1.3">
+<h3 data-number="5.1.3" class="anchored" data-anchor-id="return-values"><span class="header-section-number">5.1.3</span> Return Values</h3>
+<p>The original version of <code>summarize_vector()</code> simply printed the results using <code>cat()</code>, but it did not return a value. In practice, we often want a function to return an object so that the result can be stored or used later in further computations.</p>
+<p>In R, the value returned by a function is typically the result of the final (unassigned) expression in the function body. If we want to return multiple values, we usually combine them into a single object. The most common way to do this is to return a list.</p>
+<p>Here’s a revised version of the function that prints the results and returns a list:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>summarize_vector <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  Mean <span class="ot">&lt;-</span> <span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  SD <span class="ot">&lt;-</span> <span class="fu">sd</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  n_missing <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(x))</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Mean:"</span>, Mean, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Standard Deviation:"</span>, SD, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Number of Missing Values:"</span>, n_missing, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Mean =</span> Mean,</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">SD =</span> SD,</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">N_miss =</span> n_missing</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>v1_summary <span class="ot">&lt;-</span> <span class="fu">summarize_vector</span>(v1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean: 30 
+Standard Deviation: 39.52847 
+Number of Missing Values: 1 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>v1_summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$Mean
+[1] 30
+
+$SD
+[1] 39.52847
+
+$N_miss
+[1] 1</code></pre>
+</div>
+</div>
+<p>Alternatively, if all the values share the same data type, you can return them as a named vector instead of a list:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>summarize_vector <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  Mean <span class="ot">&lt;-</span> <span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  SD <span class="ot">&lt;-</span> <span class="fu">sd</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  n_missing <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(x))</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Mean:"</span>, Mean, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Standard Deviation:"</span>, SD, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Number of Missing Values:"</span>, n_missing, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Mean =</span> Mean,</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">SD =</span> SD,</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">N_miss =</span> n_missing</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a>v1_summary <span class="ot">&lt;-</span> <span class="fu">summarize_vector</span>(v1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Mean: 30 
+Standard Deviation: 39.52847 
+Number of Missing Values: 1 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>v1_summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Mean       SD   N_miss 
+30.00000 39.52847  1.00000 </code></pre>
+</div>
+</div>
+<p>The important idea here is that a function must return exactly one object. That object can be as simple as a number or as complex as a list or data frame—it just has to be one object. This often requires some thoughtful design, especially when returning multiple pieces of related information.</p>
+<p>Finally, you can also use the <code>return()</code> function to explicitly return a value. Although it’s not required in most cases, <code>return()</code> can be useful if you want to stop a function early and send back a result. You’ll find this especially helpful later when we learn about <code>if</code> statements.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">return</span>(<span class="fu">c</span>(<span class="at">Mean =</span> Mean, <span class="at">SD =</span> SD, <span class="at">N_miss =</span> n_missing))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="execution-order-in-functions" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="execution-order-in-functions"><span class="header-section-number">5.2</span> Execution Order in Functions</h2>
+<p>When we write functions, it’s not just the individual commands that matter—it’s the order in which we execute them. In most real-world applications, each step depends on the output of a previous step, so getting the sequence right is essential. In this section, we’ll explore this idea using a few concrete examples, starting with some simple ones and building up to more practical applications.</p>
+<section id="sequential-execution-with-simple-calculations" class="level3" data-number="5.2.1">
+<h3 data-number="5.2.1" class="anchored" data-anchor-id="sequential-execution-with-simple-calculations"><span class="header-section-number">5.2.1</span> Sequential Execution with Simple Calculations</h3>
+<p>When writing a function, it’s important to pay attention to the order in which the commands are executed. Many operations depend on results from earlier steps. If you skip a step or rearrange the code incorrectly, the function may fail or return the wrong result.</p>
+<p>Let’s work through a simple example. Suppose we want to standardize the values in a numeric vector, and print the results in a readable format.</p>
+<p>We can begin by testing this in open code using a sample vector <code>v1</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>v1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">12</span>, <span class="dv">15</span>, <span class="dv">18</span>, <span class="dv">100</span>)</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>mean_v1 <span class="ot">&lt;-</span> <span class="fu">mean</span>(v1, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>sd_v1 <span class="ot">&lt;-</span> <span class="fu">sd</span>(v1, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> (v1 <span class="sc">-</span> mean_v1) <span class="sc">/</span> sd_v1</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>extreme_count <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">abs</span>(z) <span class="sc">&gt;</span> <span class="dv">2</span>)</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Standardized values:"</span>, <span class="fu">round</span>(z, <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Standardized values: -0.6 -0.46 -0.41 -0.32 -0.24 2.03 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"Number of extreme values:"</span>, extreme_count, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of extreme values: 1 </code></pre>
+</div>
+</div>
+<p>Every line here builds on the previous one. For example, we cannot compute <code>z</code> without calculating the mean and standard deviation first. If you change the order of these statements, the code won’t work.</p>
+<p>We apply <code>round(z, 2)</code> inside <code>cat()</code> to make the printed output easier to read. The internal calculations are still done with full precision.</p>
+<p>To make this task reusable, we can write a function. This time, we’ll use two parameters:</p>
+<ul>
+<li><code>x</code>: the numeric vector</li>
+<li><code>cutoff</code>: the threshold for identifying extreme values</li>
+</ul>
+<p>Here’s the function version:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>summarize_extremes <span class="ot">&lt;-</span> <span class="cf">function</span>(x, cutoff) {</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  mean_x <span class="ot">&lt;-</span> <span class="fu">mean</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  sd_x <span class="ot">&lt;-</span> <span class="fu">sd</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> (x <span class="sc">-</span> mean_x) <span class="sc">/</span> sd_x</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  extreme_count <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">abs</span>(z) <span class="sc">&gt;</span> cutoff)</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Standardized values:"</span>, <span class="fu">round</span>(z, <span class="dv">2</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Number of extreme values:"</span>, extreme_count, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s test the function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize_extremes</span>(v1, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Standardized values: -0.6 -0.46 -0.41 -0.32 -0.24 2.03 
+Number of extreme values: 1 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summarize_extremes</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">100</span>), <span class="fl">1.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Standardized values: -0.48 -0.46 -0.44 -0.41 1.79 
+Number of extreme values: 1 </code></pre>
+</div>
+</div>
+<p>This example highlights two important ideas about writing functions:</p>
+<ul>
+<li>The order of commands matters—each step often depends on values computed earlier.</li>
+<li>Functions can be made more flexible by accepting multiple parameters, such as the data and a threshold value.</li>
+</ul>
+</section>
+<section id="application-imputing-numeric-variables" class="level3" data-number="5.2.2">
+<h3 data-number="5.2.2" class="anchored" data-anchor-id="application-imputing-numeric-variables"><span class="header-section-number">5.2.2</span> Application: Imputing Numeric Variables</h3>
+<p>In the previous chapter, we examined how to replace missing values in a numeric vector with the median. Now, suppose we want to apply this idea more generally—to replace missing values in a column of a data frame. Since this task could be useful across many datasets and variables, it makes sense to write a reusable function.</p>
+<p>We’ll name this function <code>impute_num()</code>.</p>
+<p><strong>Choosing Parameters</strong></p>
+<p>To make the function flexible, we need to allow both the data frame and the target variable to change. So our function will take two parameters:</p>
+<ul>
+<li><code>dat</code>: the data frame</li>
+<li><code>var_name</code>: the name of the numeric variable (as a string)</li>
+</ul>
+<p>We begin by setting up the function shell:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>impute_num <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, var_name){</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Function body</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s walk through how to build the function body step by step. We’ll use the patient dataset as our working example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"patient.RData"</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>patient</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   ID GLUC TGL HDL LDL  HRT MAMM SMOKE
+1   A   88  NA  32  99    Y    Y     Y
+2   B   NA 150  60  NA &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+3   C  110  NA  NA 120    N    N     N
+4   D   NA 200  65 165 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+5   E   90 210  NA 150    Y    Y     Y
+6   F   88  NA  32 210 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+7   G  120 164  NA  NA    Y    Y     Y
+8   H  110 170  70 188 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+9   I   NA 190  NA 190    N    N     N
+10  J   90  NA  75  NA &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;</code></pre>
+</div>
+</div>
+<p>We plan to test the function using <code>impute_num(patient, "GLUC")</code>. To simulate what happens inside the function, we first assign the argument values to the parameter names:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> patient     <span class="do">## input argument 1</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>var_name <span class="ot">&lt;-</span> <span class="st">"GLUC"</span> <span class="do">## input argument 2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Sequential Steps</strong></p>
+<p>Now we can write out the logic. The goal is to replace all <code>NA</code> values in a numeric column with its median. Here’s how we’ll do it:</p>
+<ol type="1">
+<li>Extract the numeric column from the data frame using <code>[[ ]]</code></li>
+<li>Calculate the median of the extracted vector</li>
+<li>Replace the missing values with the median</li>
+<li>Insert the cleaned vector back into the original data frame</li>
+</ol>
+<p>Each step must be done in order. For example, we can’t calculate the median before we extract the column. The process looks like this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>select_var <span class="ot">&lt;-</span> dat[[var_name]]                  <span class="do">## step 1: </span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>select_var</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1]  88  NA 110  NA  90  88 120 110  NA  90</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>replace_value <span class="ot">&lt;-</span> <span class="fu">median</span>(select_var, <span class="at">na.rm=</span>T)   <span class="do">## step 2</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>replace_value</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 90</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>select_var[<span class="fu">is.na</span>(select_var)] <span class="ot">&lt;-</span> replace_value <span class="do">## step 3: </span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>select_var </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1]  88  90 110  90  90  88 120 110  90  90</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>dat[[var_name]] <span class="ot">&lt;-</span> select_var                  <span class="do">## step 4</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>dat</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   ID GLUC TGL HDL LDL  HRT MAMM SMOKE
+1   A   88  NA  32  99    Y    Y     Y
+2   B   90 150  60  NA &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+3   C  110  NA  NA 120    N    N     N
+4   D   90 200  65 165 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+5   E   90 210  NA 150    Y    Y     Y
+6   F   88  NA  32 210 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+7   G  120 164  NA  NA    Y    Y     Y
+8   H  110 170  70 188 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+9   I   90 190  NA 190    N    N     N
+10  J   90  NA  75  NA &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;</code></pre>
+</div>
+</div>
+<p>Once all the pieces work individually, we can bundle them into our function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>impute_num <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, var_name){</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  select_var <span class="ot">&lt;-</span> dat[[var_name]]                  <span class="do">## step 1: </span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  replace_value <span class="ot">&lt;-</span> <span class="fu">median</span>(select_var, <span class="at">na.rm=</span>T)   <span class="do">## step 2</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  select_var[<span class="fu">is.na</span>(select_var)] <span class="ot">&lt;-</span> replace_value <span class="do">## step 3: </span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  dat[[var_name]] <span class="ot">&lt;-</span> select_var                  <span class="do">## step 4</span></span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>  dat           <span class="do">## returned value</span></span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s test it on different columns:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">impute_num</span> (patient, <span class="st">"GLUC"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   ID GLUC TGL HDL LDL  HRT MAMM SMOKE
+1   A   88  NA  32  99    Y    Y     Y
+2   B   90 150  60  NA &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+3   C  110  NA  NA 120    N    N     N
+4   D   90 200  65 165 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+5   E   90 210  NA 150    Y    Y     Y
+6   F   88  NA  32 210 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+7   G  120 164  NA  NA    Y    Y     Y
+8   H  110 170  70 188 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+9   I   90 190  NA 190    N    N     N
+10  J   90  NA  75  NA &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">impute_num</span> (patient, <span class="st">"TGL"</span>)   <span class="do">## try another variable</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   ID GLUC TGL HDL LDL  HRT MAMM SMOKE
+1   A   88 180  32  99    Y    Y     Y
+2   B   NA 150  60  NA &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+3   C  110 180  NA 120    N    N     N
+4   D   NA 200  65 165 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+5   E   90 210  NA 150    Y    Y     Y
+6   F   88 180  32 210 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+7   G  120 164  NA  NA    Y    Y     Y
+8   H  110 170  70 188 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+9   I   NA 190  NA 190    N    N     N
+10  J   90 180  75  NA &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;</code></pre>
+</div>
+</div>
+<p>This example demonstrates how each step in a function builds on the last—and why preserving the correct order is essential for correct results.</p>
+</section>
+<section id="application-imputing-character-variables" class="level3" data-number="5.2.3">
+<h3 data-number="5.2.3" class="anchored" data-anchor-id="application-imputing-character-variables"><span class="header-section-number">5.2.3</span> Application: Imputing Character Variables</h3>
+<p>Just like with numeric variables, we often encounter missing values in character columns—such as patient status, gender, or treatment group. A common strategy is to fill in these missing values using the most frequent (or most common) category.</p>
+<p>In this section, we’ll create a function called <code>impute_char()</code> to do exactly that. Similar to <code>impute_num()</code>, this function will take two parameters:</p>
+<ul>
+<li><code>dat</code>: the data frame</li>
+<li><code>var_name</code>: the name of the character variable (as a string)</li>
+</ul>
+<p>Let’s begin with the function shell:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>impute_char <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, var_name) {</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Function body</span></span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We’ll use the same <code>patient</code> dataset to test the commands before writing the complete function. To simulate the function behavior, we assign the test arguments to their corresponding parameter names:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> patient        <span class="do">## input parameter 1</span></span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>var_name <span class="ot">&lt;-</span> <span class="st">"HRT"</span>     <span class="do">## input parameter 2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Our goal is to replace missing values in a character vector with the value that occurs most frequently. Here’s the sequence of operations we’ll follow:</p>
+<ol type="1">
+<li>Extract the character column from the data frame.</li>
+<li>Create a frequency table.</li>
+<li>Identify the most common value.</li>
+<li>Replace all missing values with that value.</li>
+<li>Insert the updated column back into the data frame.</li>
+</ol>
+<p>Let’s test each step:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>select_var <span class="ot">&lt;-</span> dat[[var_name]]         <span class="co"># Step 1: extract variable</span></span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>tab_result <span class="ot">&lt;-</span> <span class="fu">table</span>(select_var)       <span class="co"># Step 2: frequency table</span></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>high_freq  <span class="ot">&lt;-</span> <span class="fu">max</span>(tab_result)         <span class="co"># Step 3a: get highest frequency</span></span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>replace_value <span class="ot">&lt;-</span> <span class="fu">names</span>(tab_result)[tab_result <span class="sc">==</span> high_freq]  <span class="co"># Step 3b</span></span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>select_var[<span class="fu">is.na</span>(select_var)] <span class="ot">&lt;-</span> replace_value  <span class="co"># Step 4</span></span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a>dat[[var_name]] <span class="ot">&lt;-</span> select_var         <span class="co"># Step 5: put it back</span></span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a>dat</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   ID GLUC TGL HDL LDL HRT MAMM SMOKE
+1   A   88  NA  32  99   Y    Y     Y
+2   B   NA 150  60  NA   Y &lt;NA&gt;  &lt;NA&gt;
+3   C  110  NA  NA 120   N    N     N
+4   D   NA 200  65 165   Y &lt;NA&gt;  &lt;NA&gt;
+5   E   90 210  NA 150   Y    Y     Y
+6   F   88  NA  32 210   Y &lt;NA&gt;  &lt;NA&gt;
+7   G  120 164  NA  NA   Y    Y     Y
+8   H  110 170  70 188   Y &lt;NA&gt;  &lt;NA&gt;
+9   I   NA 190  NA 190   N    N     N
+10  J   90  NA  75  NA   Y &lt;NA&gt;  &lt;NA&gt;</code></pre>
+</div>
+</div>
+<p>After confirming these steps work correctly, we can write the full function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>impute_char <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, var_name){</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  select_var <span class="ot">&lt;-</span> dat[[var_name]]                   <span class="co"># step 1</span></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>  tab_result <span class="ot">&lt;-</span> <span class="fu">table</span>(select_var)                 <span class="co"># step 2</span></span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>  high_freq <span class="ot">&lt;-</span> <span class="fu">max</span>(tab_result)                    <span class="co"># step 3a</span></span>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a>  replace_value <span class="ot">&lt;-</span> <span class="fu">names</span>(tab_result)[tab_result <span class="sc">==</span> high_freq]  <span class="co"># step 3b</span></span>
+<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a>  select_var[<span class="fu">is.na</span>(select_var)] <span class="ot">&lt;-</span> replace_value  <span class="co"># step 4</span></span>
+<span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>  dat[[var_name]] <span class="ot">&lt;-</span> select_var                   <span class="co"># step 5</span></span>
+<span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a>  dat  <span class="co"># return updated data frame</span></span>
+<span id="cb67-9"><a href="#cb67-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s test it out:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">impute_char</span>(patient, <span class="st">"HRT"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   ID GLUC TGL HDL LDL HRT MAMM SMOKE
+1   A   88  NA  32  99   Y    Y     Y
+2   B   NA 150  60  NA   Y &lt;NA&gt;  &lt;NA&gt;
+3   C  110  NA  NA 120   N    N     N
+4   D   NA 200  65 165   Y &lt;NA&gt;  &lt;NA&gt;
+5   E   90 210  NA 150   Y    Y     Y
+6   F   88  NA  32 210   Y &lt;NA&gt;  &lt;NA&gt;
+7   G  120 164  NA  NA   Y    Y     Y
+8   H  110 170  70 188   Y &lt;NA&gt;  &lt;NA&gt;
+9   I   NA 190  NA 190   N    N     N
+10  J   90  NA  75  NA   Y &lt;NA&gt;  &lt;NA&gt;</code></pre>
+</div>
+</div>
+<p>This example reinforces the importance of logic and order: we must first identify the most frequent value before using it to fill in missing entries.</p>
+</section>
+</section>
+<section id="function-parameters" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="function-parameters"><span class="header-section-number">5.3</span> Function Parameters</h2>
+<p>When we define a function, we often include one or more parameters—placeholders that will be filled with actual values, known as arguments, when the function is called. Understanding how arguments are matched to parameters, how default values work, and how R evaluates them is essential for writing clear, reusable, and flexible functions. In the following subsections, we explore different ways arguments can be passed to parameters, how default values simplify function calls, and when certain types of parameter behavior matter in practice.</p>
+<section id="matching-arguments-to-parameters" class="level3" data-number="5.3.1">
+<h3 data-number="5.3.1" class="anchored" data-anchor-id="matching-arguments-to-parameters"><span class="header-section-number">5.3.1</span> Matching Arguments to Parameters</h3>
+<p>In the <code>impute_num()</code> function, there are two parameters: <code>dat</code> and <code>var_name</code>. When we call the function like this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">impute_num</span>(patient, <span class="st">"GLUC"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>the argument <code>patient</code> is assigned to the parameter <code>dat</code>, and <code>"GLUC"</code> is assigned to <code>var_name</code>. This method of matching arguments by their position in the function call is called <strong>positional matching</strong>.</p>
+<p>An alternative approach is <strong>keyword matching</strong>, where we specify arguments using the <code>parameter = argument</code> format:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">impute_num</span>(<span class="at">dat =</span> patient, <span class="at">var_name =</span> <span class="st">"GLUC"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>With keyword matching, we do <strong>not</strong> need to follow the parameter order:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">impute_num</span>(<span class="at">var_name =</span> <span class="st">"GLUC"</span>, <span class="at">dat =</span> patient)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Both positional and keyword matching can be used together, although once you use keyword matching in a function call, it’s best to continue using it for clarity.</p>
+</section>
+<section id="default-arguments" class="level3" data-number="5.3.2">
+<h3 data-number="5.3.2" class="anchored" data-anchor-id="default-arguments"><span class="header-section-number">5.3.2</span> Default Arguments</h3>
+<p>We can assign default values to one or more parameters, making the function more flexible and easier to use. This is helpful when one parameter usually takes the same value. For example, suppose we use the <code>patient</code> dataset most of the time. We can set it as the default for <code>dat</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>impute_num <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">dat =</span> patient, var_name) {</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>  select_var <span class="ot">&lt;-</span> dat[[var_name]] </span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>  replace_value <span class="ot">&lt;-</span> <span class="fu">median</span>(select_var, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>  select_var[<span class="fu">is.na</span>(select_var)] <span class="ot">&lt;-</span> replace_value </span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>  dat[[var_name]] <span class="ot">&lt;-</span> select_var </span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a>  dat </span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now, we only need to specify <code>var_name</code> when using the patient dataset:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a><span class="fu">impute_num</span>(<span class="at">var_name =</span> <span class="st">"GLUC"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   ID GLUC TGL HDL LDL  HRT MAMM SMOKE
+1   A   88  NA  32  99    Y    Y     Y
+2   B   90 150  60  NA &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+3   C  110  NA  NA 120    N    N     N
+4   D   90 200  65 165 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+5   E   90 210  NA 150    Y    Y     Y
+6   F   88  NA  32 210 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+7   G  120 164  NA  NA    Y    Y     Y
+8   H  110 170  70 188 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+9   I   90 190  NA 190    N    N     N
+10  J   90  NA  75  NA &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;</code></pre>
+</div>
+</div>
+<p>If we supply a different data frame, it overrides the default:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>foo <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">var1 =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">4</span>, <span class="cn">NA</span>, <span class="dv">7</span>, <span class="dv">9</span>))</span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a><span class="fu">impute_num</span>(foo, <span class="st">"var1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  var1
+1  1.0
+2  4.0
+3  5.5
+4  7.0
+5  9.0</code></pre>
+</div>
+</div>
+</section>
+<section id="why-use-instead-of" class="level3" data-number="5.3.3">
+<h3 data-number="5.3.3" class="anchored" data-anchor-id="why-use-instead-of"><span class="header-section-number">5.3.3</span> Why Use [[ Instead of $?</h3>
+<p>Inside the function, we extract a column with <code>dat[[var_name]]</code> rather than <code>dat$var_name</code>. This is because the <code>$</code> operator does not evaluate variables, so writing <code>dat$var_name</code> will literally look for a column named <code>"var_name"</code>, not the value stored in the <code>var_name</code> variable. The double bracket operator <code>[[ ]]</code>, however, <strong>evaluates</strong> its argument and works with variable column names.</p>
+</section>
+<section id="parameterless-functions" class="level3" data-number="5.3.4">
+<h3 data-number="5.3.4" class="anchored" data-anchor-id="parameterless-functions"><span class="header-section-number">5.3.4</span> Parameterless Functions</h3>
+<p>Not all functions require input parameters. While less common for beginners, parameterless functions can still be useful. Here’s a simple example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>greeting_function <span class="ot">&lt;-</span> <span class="cf">function</span>() {</span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">"Hello, welcome to the world of R programming!"</span>)</span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a><span class="fu">greeting_function</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Hello, welcome to the world of R programming!"</code></pre>
+</div>
+</div>
+<p>This function will always return the same greeting when called, without needing any input.</p>
+<p>If a function body contains only a single command, the curly braces <code>{}</code> are optional. For example, the following version of <code>greeting_function()</code> is equivalent:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>greeting_function <span class="ot">&lt;-</span> <span class="cf">function</span>() <span class="fu">print</span>(<span class="st">"Hello, welcome to the world of R programming!"</span>)</span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a><span class="fu">greeting_function</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Hello, welcome to the world of R programming!"</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="condition-logic" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="condition-logic"><span class="header-section-number">5.4</span> Condition Logic</h2>
+<p>In programming, conditional logic allows us to control which pieces of code run based on whether certain conditions are true or false. Just as people make decisions based on situations (“If it’s raining, take an umbrella”), R functions can adapt their behavior using structures like <code>if</code>, <code>else</code>, and logical operators. These tools make our code smarter and more flexible—able to handle different inputs, trigger warnings, or change behavior depending on data values.</p>
+<p>This section introduces several key components of conditional logic:</p>
+<section id="the-if-statement" class="level3" data-number="5.4.1">
+<h3 data-number="5.4.1" class="anchored" data-anchor-id="the-if-statement"><span class="header-section-number">5.4.1</span> The <code>if</code> Statement</h3>
+<p>The <code>if</code> statement is the most basic form of conditional logic in R. It allows your code to make decisions: if a certain condition is true, do one thing; if not, do something else. The general forms of the <code>if</code> statement are:</p>
+<pre><code>if (condition) expression
+if (condition) expression else alternative_expression</code></pre>
+<p>In the first form, R evaluates the <code>condition</code>. If it is true, it runs the <code>expression</code>. If it is false, nothing happens.</p>
+<p>In the second form, the <code>else</code> block provides an alternative. If the <code>condition</code> is false, R will execute the <code>alternative_expression</code>. This syntax and logic flow are consistent with standard base R practices, as outlined in <em>R Programming for Data Science</em> <span class="citation" data-cites="peng2020r">(<a href="#ref-peng2020r" role="doc-biblioref">Peng 2020</a>)</span>.</p>
+<p>Here’s a simple example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a>score <span class="ot">&lt;-</span> <span class="dv">73</span></span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (score <span class="sc">&gt;=</span><span class="dv">60</span>) grade <span class="ot">&lt;-</span> <span class="st">"pass"</span> <span class="cf">else</span> grade <span class="ot">&lt;-</span> <span class="st">"fail"</span></span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>grade</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "pass"</code></pre>
+</div>
+</div>
+<p>If your logic spans multiple lines, you should enclose the expressions inside curly braces <code>{}</code> to create a code block:</p>
+<pre><code>if (condition) {
+  command_1
+  command_2
+  ...
+} else {
+  command_3
+  command_4
+  ...
+}</code></pre>
+<p>For example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>score <span class="ot">&lt;-</span> <span class="dv">73</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (score <span class="sc">&gt;=</span><span class="dv">60</span>) {</span>
+<span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>  grade <span class="ot">&lt;-</span> <span class="st">"pass"</span> </span>
+<span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a>  score <span class="ot">&lt;-</span> <span class="fu">round</span>(score<span class="sc">/</span><span class="dv">10</span>)</span>
+<span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a>  grade <span class="ot">&lt;-</span> <span class="st">"fail"</span></span>
+<span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a>  score <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a>grade</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "pass"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>score</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7</code></pre>
+</div>
+</div>
+<p>If you need to check multiple conditions, you can chain them using <code>else if</code>:</p>
+<pre><code>if (cond_1) {
+  command(s)
+} else if (cond_2){
+  command(s)
+} else if (cond_3){
+  command(s)
+} else{
+  command(s)
+}</code></pre>
+<p>For example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>score <span class="ot">&lt;-</span> <span class="dv">73</span></span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (score <span class="sc">&gt;=</span><span class="dv">90</span>) {</span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>  grade <span class="ot">&lt;-</span> <span class="st">"A"</span> </span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> <span class="cf">if</span> (score <span class="sc">&gt;=</span><span class="dv">80</span>) {</span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>  grade <span class="ot">&lt;-</span> <span class="st">"B"</span></span>
+<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> <span class="cf">if</span> (score <span class="sc">&gt;=</span><span class="dv">70</span>) {</span>
+<span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a>  grade <span class="ot">&lt;-</span> <span class="st">"C"</span></span>
+<span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> <span class="cf">if</span> (score <span class="sc">&gt;=</span><span class="dv">60</span>) {</span>
+<span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a>  grade <span class="ot">&lt;-</span> <span class="st">"D"</span></span>
+<span id="cb91-10"><a href="#cb91-10" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb91-11"><a href="#cb91-11" aria-hidden="true" tabindex="-1"></a>  grade <span class="ot">&lt;-</span> <span class="st">"F"</span></span>
+<span id="cb91-12"><a href="#cb91-12" aria-hidden="true" tabindex="-1"></a>} </span>
+<span id="cb91-13"><a href="#cb91-13" aria-hidden="true" tabindex="-1"></a>grade</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "C"</code></pre>
+</div>
+</div>
+<p>Each condition is evaluated in order. Once a condition is found to be true, the corresponding block is executed, and the rest are skipped.</p>
+</section>
+<section id="logical-operators" class="level3" data-number="5.4.2">
+<h3 data-number="5.4.2" class="anchored" data-anchor-id="logical-operators"><span class="header-section-number">5.4.2</span> Logical Operators</h3>
+<p>Logical operators allow us to compare values and evaluate conditions. In R, the most commonly used logical operators are:</p>
+<ul>
+<li><code>&amp;</code> (element-wise AND)</li>
+<li><code>|</code> (element-wise OR)</li>
+<li><code>!</code> (logical NOT)</li>
+</ul>
+<p>These operators compare vectors element by element:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">9</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">8</span>, <span class="sc">-</span><span class="dv">2</span>)</span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>a <span class="sc">&lt;</span> <span class="dv">5</span> <span class="sc">&amp;</span> a <span class="sc">!=</span> <span class="dv">0</span>    </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  TRUE FALSE FALSE  TRUE FALSE FALSE  TRUE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>a <span class="sc">&lt;</span> <span class="dv">3</span> <span class="sc">|</span> a <span class="sc">&gt;=</span> <span class="dv">8</span>   </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE</code></pre>
+</div>
+</div>
+<p>In addition to the element-wise operators, R provides short-circuit logical operators:</p>
+<ul>
+<li><code>&amp;&amp;</code> (short-circuit AND)</li>
+<li><code>||</code> (short-circuit OR)</li>
+</ul>
+<p>These two operators evaluate expressions <em>from left to right</em> and <em>stop as soon as the result is known</em>. They are used primarily in control structures like <code>if</code> statements.</p>
+<p><strong>Important</strong>: Both <code>&amp;&amp;</code> and <code>||</code> require each side to return a single logical value. Using them on vectors longer than one element will result in an error.</p>
+<p>The following function uses a short-circuit <code>&amp;&amp;</code> operator inside an <code>if</code> statement to ensure that the input is numeric and all values are positive before calculating square roots and logarithms:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>sqrt_log <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.numeric</span>(x) <span class="sc">&amp;&amp;</span> <span class="fu">min</span>(x) <span class="sc">&gt;</span> <span class="dv">0</span>){</span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>    x_sqrt <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(x)</span>
+<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>    x_log <span class="ot">&lt;-</span> <span class="fu">log</span>(x)</span>
+<span id="cb97-5"><a href="#cb97-5" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb97-6"><a href="#cb97-6" aria-hidden="true" tabindex="-1"></a>    x_sqrt <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb97-7"><a href="#cb97-7" aria-hidden="true" tabindex="-1"></a>    x_log <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb97-8"><a href="#cb97-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb97-9"><a href="#cb97-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(x_sqrt, x_log)</span>
+<span id="cb97-10"><a href="#cb97-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>When the input meets the condition, the calculations proceed:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt_log</span>(<span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">3</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.4142136 2.0000000 1.7320508 0.6931472 1.3862944 1.0986123</code></pre>
+</div>
+</div>
+<p>If not, the function returns <code>NA</code> values:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt_log</span>(<span class="fu">c</span>(<span class="st">"hello"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] NA NA</code></pre>
+</div>
+</div>
+<p>This demonstrates how short-circuit logic can help ensure safe execution by checking multiple conditions before proceeding.</p>
+</section>
+<section id="application-print-customized-message" class="level3" data-number="5.4.3">
+<h3 data-number="5.4.3" class="anchored" data-anchor-id="application-print-customized-message"><span class="header-section-number">5.4.3</span> Application: Print Customized Message</h3>
+<p>When writing functions, it’s often helpful to provide feedback to users when inputs do not meet expectations. This can make functions easier to use and debug. There are several ways to communicate issues or guidance to users, depending on how severe the issue is and whether or not the function should continue running.</p>
+<p><strong><code>stop()</code>: Halt Execution with an Error Message</strong></p>
+<p>Use the <code>stop()</code> function to terminate execution immediately when a critical condition is not met. This is useful when continuing the function could lead to incorrect results or unexpected behavior.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>sqrt_log <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.numeric</span>(x) <span class="sc">&amp;&amp;</span> <span class="fu">min</span>(x) <span class="sc">&gt;</span> <span class="dv">0</span>){</span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>    x_sqrt <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(x)</span>
+<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>    x_log <span class="ot">&lt;-</span> <span class="fu">log</span>(x)</span>
+<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> </span>
+<span id="cb102-6"><a href="#cb102-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span> (<span class="st">"x must be a numeric vector with values &gt; 0."</span>)</span>
+<span id="cb102-7"><a href="#cb102-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(x_sqrt, x_log)</span>
+<span id="cb102-8"><a href="#cb102-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb102-9"><a href="#cb102-9" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt_log</span>(<span class="fu">c</span>(<span class="st">"hello"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>Error in sqrt_log(c("hello")): x must be a numeric vector with values &gt; 0.</code></pre>
+</div>
+</div>
+<p><strong><code>cat()</code>: Print a Message and Continue Execution</strong></p>
+<p>The <code>cat()</code> function can be used to print a message to the console without interrupting the flow of execution. You might use this when a non-critical issue arises but the function can still return a fallback result.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>sqrt_log <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.numeric</span>(x) <span class="sc">&amp;&amp;</span> <span class="fu">min</span>(x) <span class="sc">&gt;</span> <span class="dv">0</span>){</span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>    x_sqrt <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(x)</span>
+<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a>    x_log <span class="ot">&lt;-</span> <span class="fu">log</span>(x)</span>
+<span id="cb104-5"><a href="#cb104-5" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb104-6"><a href="#cb104-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span> (<span class="st">"x must be a numeric vector with values &gt; 0. </span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb104-7"><a href="#cb104-7" aria-hidden="true" tabindex="-1"></a>    x_sqrt <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb104-8"><a href="#cb104-8" aria-hidden="true" tabindex="-1"></a>    x_log <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb104-9"><a href="#cb104-9" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb104-10"><a href="#cb104-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(x_sqrt, x_log)</span>
+<span id="cb104-11"><a href="#cb104-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb104-12"><a href="#cb104-12" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt_log</span>(<span class="fu">c</span>(<span class="st">"hello"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>x must be a numeric vector with values &gt; 0. </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] NA NA</code></pre>
+</div>
+</div>
+<p><strong><code>warning()</code>: Signal a Warning but Continue Execution</strong></p>
+<p>The <code>warning()</code> function signals that something might be wrong, but it doesn’t stop execution. This is useful when the function can proceed, but the user should be alerted to a potential issue.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>sqrt_log <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.numeric</span>(x) <span class="sc">&amp;&amp;</span> <span class="fu">min</span>(x) <span class="sc">&gt;</span> <span class="dv">0</span>){</span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>    x_sqrt <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(x)</span>
+<span id="cb107-4"><a href="#cb107-4" aria-hidden="true" tabindex="-1"></a>    x_log <span class="ot">&lt;-</span> <span class="fu">log</span>(x)</span>
+<span id="cb107-5"><a href="#cb107-5" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb107-6"><a href="#cb107-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">warning</span>(<span class="st">"x should be a numeric vector with values &gt; 0."</span>)</span>
+<span id="cb107-7"><a href="#cb107-7" aria-hidden="true" tabindex="-1"></a>    x_sqrt <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb107-8"><a href="#cb107-8" aria-hidden="true" tabindex="-1"></a>    x_log <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb107-9"><a href="#cb107-9" aria-hidden="true" tabindex="-1"></a>  } </span>
+<span id="cb107-10"><a href="#cb107-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(x_sqrt, x_log)</span>
+<span id="cb107-11"><a href="#cb107-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb107-12"><a href="#cb107-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-13"><a href="#cb107-13" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt_log</span>(<span class="fu">c</span>(<span class="st">"hello"</span>))  <span class="co"># Issues warning, returns NA</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in sqrt_log(c("hello")): x should be a numeric vector with values &gt; 0.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] NA NA</code></pre>
+</div>
+</div>
+<p><strong>Summary</strong></p>
+<ul>
+<li>Use <code>stop()</code> when the input is invalid and you want to halt the function.</li>
+<li>Use <code>warning()</code> when the input is questionable but the function can still proceed.</li>
+<li>Use <code>cat()</code> when you want to print a friendly message to the user without treating it as an error or warning.</li>
+</ul>
+</section>
+<section id="application-the-impute-function" class="level3" data-number="5.4.4">
+<h3 data-number="5.4.4" class="anchored" data-anchor-id="application-the-impute-function"><span class="header-section-number">5.4.4</span> Application: The <code>impute()</code> Function</h3>
+<p>To avoid writing separate functions for numeric and character variables, we can combine both imputation tasks into a single function using conditional logic. The <code>impute()</code> function checks the variable type and then decides how to compute the replacement value. We also add a check to ensure the variable name is valid within the provided data frame.</p>
+<p>Before defining the function, it’s a good idea to test the code line by line:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> patient                  <span class="do">## input data frame</span></span>
+<span id="cb110-2"><a href="#cb110-2" aria-hidden="true" tabindex="-1"></a>var_name <span class="ot">&lt;-</span> <span class="st">"HRT"</span>               <span class="do">## name of the variable to impute</span></span>
+<span id="cb110-3"><a href="#cb110-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb110-4"><a href="#cb110-4" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="sc">!</span>var_name <span class="sc">%in%</span> <span class="fu">names</span>(dat)){  <span class="do">## check if var_name exists in dat</span></span>
+<span id="cb110-5"><a href="#cb110-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stop</span>(var_name, <span class="st">" is not in the given data"</span>, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb110-6"><a href="#cb110-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb110-7"><a href="#cb110-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb110-8"><a href="#cb110-8" aria-hidden="true" tabindex="-1"></a>select_var <span class="ot">&lt;-</span> dat[[var_name]]   <span class="do">## extract the variable from the data frame</span></span>
+<span id="cb110-9"><a href="#cb110-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb110-10"><a href="#cb110-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="fu">is.numeric</span>(select_var)) {    <span class="do">## if the variable is numeric...</span></span>
+<span id="cb110-11"><a href="#cb110-11" aria-hidden="true" tabindex="-1"></a>  replace_value <span class="ot">&lt;-</span> <span class="fu">median</span>(select_var, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)  <span class="do">## compute the median</span></span>
+<span id="cb110-12"><a href="#cb110-12" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {                        <span class="do">## otherwise (e.g., character variable)...</span></span>
+<span id="cb110-13"><a href="#cb110-13" aria-hidden="true" tabindex="-1"></a>  tab_result <span class="ot">&lt;-</span> <span class="fu">table</span>(select_var)               <span class="do">## create frequency table</span></span>
+<span id="cb110-14"><a href="#cb110-14" aria-hidden="true" tabindex="-1"></a>  high_freq <span class="ot">&lt;-</span> <span class="fu">max</span>(tab_result)                  <span class="do">## find the max frequency</span></span>
+<span id="cb110-15"><a href="#cb110-15" aria-hidden="true" tabindex="-1"></a>  replace_value <span class="ot">&lt;-</span> <span class="fu">names</span>(tab_result)[tab_result <span class="sc">==</span> high_freq] </span>
+<span id="cb110-16"><a href="#cb110-16" aria-hidden="true" tabindex="-1"></a>                                                <span class="do">## get most frequent value</span></span>
+<span id="cb110-17"><a href="#cb110-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb110-18"><a href="#cb110-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb110-19"><a href="#cb110-19" aria-hidden="true" tabindex="-1"></a>select_var[<span class="fu">is.na</span>(select_var)] <span class="ot">&lt;-</span> replace_value  <span class="do">## replace missing values</span></span>
+<span id="cb110-20"><a href="#cb110-20" aria-hidden="true" tabindex="-1"></a>dat[[var_name]] <span class="ot">&lt;-</span> select_var                   <span class="do">## update the original data</span></span>
+<span id="cb110-21"><a href="#cb110-21" aria-hidden="true" tabindex="-1"></a>dat                                             <span class="do">## return the updated data</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   ID GLUC TGL HDL LDL HRT MAMM SMOKE
+1   A   88  NA  32  99   Y    Y     Y
+2   B   NA 150  60  NA   Y &lt;NA&gt;  &lt;NA&gt;
+3   C  110  NA  NA 120   N    N     N
+4   D   NA 200  65 165   Y &lt;NA&gt;  &lt;NA&gt;
+5   E   90 210  NA 150   Y    Y     Y
+6   F   88  NA  32 210   Y &lt;NA&gt;  &lt;NA&gt;
+7   G  120 164  NA  NA   Y    Y     Y
+8   H  110 170  70 188   Y &lt;NA&gt;  &lt;NA&gt;
+9   I   NA 190  NA 190   N    N     N
+10  J   90  NA  75  NA   Y &lt;NA&gt;  &lt;NA&gt;</code></pre>
+</div>
+</div>
+<p>Once verified, we can wrap these steps into a reusable function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a>impute <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, var_name){</span>
+<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span>var_name <span class="sc">%in%</span> <span class="fu">names</span>(dat)){</span>
+<span id="cb112-3"><a href="#cb112-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(var_name, <span class="st">"is not in the given data"</span>, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb112-4"><a href="#cb112-4" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb112-5"><a href="#cb112-5" aria-hidden="true" tabindex="-1"></a>  select_var <span class="ot">&lt;-</span> dat[[var_name]]</span>
+<span id="cb112-6"><a href="#cb112-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="fu">is.numeric</span>(select_var)) { </span>
+<span id="cb112-7"><a href="#cb112-7" aria-hidden="true" tabindex="-1"></a>    replace_value <span class="ot">&lt;-</span> <span class="fu">median</span>(select_var, <span class="at">na.rm=</span>T)</span>
+<span id="cb112-8"><a href="#cb112-8" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span>{</span>
+<span id="cb112-9"><a href="#cb112-9" aria-hidden="true" tabindex="-1"></a>    tab_result <span class="ot">&lt;-</span> <span class="fu">table</span>(select_var)</span>
+<span id="cb112-10"><a href="#cb112-10" aria-hidden="true" tabindex="-1"></a>    high_freq <span class="ot">&lt;-</span> <span class="fu">max</span>(tab_result)</span>
+<span id="cb112-11"><a href="#cb112-11" aria-hidden="true" tabindex="-1"></a>    replace_value <span class="ot">&lt;-</span><span class="fu">names</span>(tab_result)[tab_result <span class="sc">==</span> high_freq]</span>
+<span id="cb112-12"><a href="#cb112-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb112-13"><a href="#cb112-13" aria-hidden="true" tabindex="-1"></a>  select_var[<span class="fu">is.na</span>(select_var)] <span class="ot">&lt;-</span> replace_value</span>
+<span id="cb112-14"><a href="#cb112-14" aria-hidden="true" tabindex="-1"></a>  dat[[var_name]] <span class="ot">&lt;-</span> select_var</span>
+<span id="cb112-15"><a href="#cb112-15" aria-hidden="true" tabindex="-1"></a>  dat</span>
+<span id="cb112-16"><a href="#cb112-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb112-17"><a href="#cb112-17" aria-hidden="true" tabindex="-1"></a><span class="fu">impute</span>(patient, <span class="st">"HRT"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   ID GLUC TGL HDL LDL HRT MAMM SMOKE
+1   A   88  NA  32  99   Y    Y     Y
+2   B   NA 150  60  NA   Y &lt;NA&gt;  &lt;NA&gt;
+3   C  110  NA  NA 120   N    N     N
+4   D   NA 200  65 165   Y &lt;NA&gt;  &lt;NA&gt;
+5   E   90 210  NA 150   Y    Y     Y
+6   F   88  NA  32 210   Y &lt;NA&gt;  &lt;NA&gt;
+7   G  120 164  NA  NA   Y    Y     Y
+8   H  110 170  70 188   Y &lt;NA&gt;  &lt;NA&gt;
+9   I   NA 190  NA 190   N    N     N
+10  J   90  NA  75  NA   Y &lt;NA&gt;  &lt;NA&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="fu">impute</span>(patient, <span class="st">"GLUC"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   ID GLUC TGL HDL LDL  HRT MAMM SMOKE
+1   A   88  NA  32  99    Y    Y     Y
+2   B   90 150  60  NA &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+3   C  110  NA  NA 120    N    N     N
+4   D   90 200  65 165 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+5   E   90 210  NA 150    Y    Y     Y
+6   F   88  NA  32 210 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+7   G  120 164  NA  NA    Y    Y     Y
+8   H  110 170  70 188 &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;
+9   I   90 190  NA 190    N    N     N
+10  J   90  NA  75  NA &lt;NA&gt; &lt;NA&gt;  &lt;NA&gt;</code></pre>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-peng2020r" class="csl-entry" role="listitem">
+Peng, Roger D. 2020. <em>R Programming for Data Science</em>. Leanpub. <a href="https://bookdown.org/rdpeng/rprogdatascience/">https://bookdown.org/rdpeng/rprogdatascience/</a>.
+</div>
+<div id="ref-wickham2023r" class="csl-entry" role="listitem">
+Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for Data Science</em>. 2nd ed. O’Reilly Media. <a href="https://r4ds.hadley.nz/functions.html">https://r4ds.hadley.nz/functions.html</a>.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./Subsetting.html" class="pagination-link" aria-label="Subsetting Objects">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Subsetting Objects</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./iteration.html" class="pagination-link" aria-label="Iteration">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Iteration</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
