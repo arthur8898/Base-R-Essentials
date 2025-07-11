@@ -1,0 +1,36 @@
+# Ignore all raw source files
+
+# RStudio session files
+.Rhistory
+.RData
+.Ruserdata
+
+# RStudio project files
+.Rproj.user/
+*.Rproj
+
+# Source content
+*.qmd
+*.bib
+*.RData
+*.docx
+
+# Build directories
+_book/
+_bookdown_files/
+_site/
+.cache/
+__pycache__/
+
+# Output files (intermediate or optional)
+*.tmp
+*.swp
+*~
+*.utf8.md
+*.knit.md
+*.html
+*.pdf
+
+# System files
+.DS_Store
+Thumbs.db
