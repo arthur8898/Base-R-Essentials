@@ -28,9 +28,15 @@ __pycache__/
 *~
 *.utf8.md
 *.knit.md
-*.html
 *.pdf
+
+# Ignore .html files globally, EXCEPT in docs/
+*.html
+!docs/
+!docs/**/*.html
 
 # System files
 .DS_Store
 Thumbs.db
+
+/.quarto/
