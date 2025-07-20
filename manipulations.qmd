@@ -1,0 +1,566 @@
+# Data Manipulations
+
+Having already acquired the skills to subset or sort data in R, we now delve into additional applications for manipulating data. One crucial aspect is *re-coding variables*, where we can transform existing data into new categories or formats to better suit our analysis. Additionally, mastering the handling of *duplicated data* is essential for ensuring the accuracy of our analyses, allowing us to identify and manage duplicate entries efficiently. Furthermore, learning techniques for *merging data* from different sources empowers us to integrate diverse datasets seamlessly, facilitating more comprehensive analyses and insights. These applications not only enhance our ability to manipulate data effectively but also broaden the scope of analyses we can perform, enabling us to extract valuable information and make informed decisions in
+various domains.
+
+## Creating and Re-coding Variables
+
+Creating a new variable based on an existing one is a common task in data manipulation. You can add a new variable to an existing data frame using either the dollar sign (`$`) or square brackets (`[` or `[[`). For example:
+
+```{r}
+d <- data.frame(
+  a = 1:4,
+  b = 5:8
+)
+d$c <- d$a + d$b             # using $ to add a new column
+d["d"] <- d[["a"]] + 2       # using [ and [[ to add a new column
+d[["e"]] <- log(d[["b"]])    
+d
+```
+
+This yields the data frame with the new variables `c` , `d` , and `e` added as combinations or transformations of the original columns.
+
+In practice, creating new variables often goes hand-in-hand with recoding or transforming existing variables. Below, we explore several methods for creating or recoding variables in base R.
+
+### Creating Variables Using Relational Operators
+
+We often create *indicator* variables based on existing continuous or categorical variables, usually for modeling purposes or to present data differently. These indicators typically take values of 1 or 0 (or are represented as logical `TRUE` / `FALSE` values). They are easily created using relational operators. When comparing a variable with a value, the result is a logical vector of `TRUE` or `FALSE`. If we want the result as numeric values `1` and `0`, we can wrap the expression in `as.integer()` to convert the logicals to 1/0.
+
+For example, using the painters dataset from the `MASS` package, suppose we want to create a logical indicator variable showing whether each painter’s Drawing score is above or below the mean of all painters’Drawing scores. We can do this with the following commands:
+
+```{r}
+library(MASS)
+painters$Drawing_ind <- painters$Drawing >= mean(painters$Drawing)
+head(painters[, c("Drawing", "Drawing_ind")])
+```
+
+The commands above add a new column `Drawing_ind` that is `TRUE` if the painter’s `Drawing` score is above the mean, and `FALSE` otherwise. 
+
+We can similarly use relational operators to create an *ordinal* categorical variable with more than two levels. For instance, suppose we want to create a new variable `Comp_ord` based on the painters’ Composition score with the following rules:
+
+-   If `Composition` < 8, assign `Comp_ord` = 1
+-   If 8 $\ge$ `Composition` < 12, assign `Comp_ord` = 2
+-   If `Composition` $\ge$ 12, assign `Comp_ord` = 3
+
+We can achieve this by exploiting the fact that logical comparisons in R can be coerced to 1/0 values. One concise method is:
+
+```{r}
+painters$Comp_ord <- 1 +
+  (painters$Composition >= 8) +
+  (painters$Composition >= 12)
+head(painters[, c("Composition", "Comp_ord")])
+```
+
+The logic here is that the expression adds 1 for each threshold passed. All observations start at 1 (the lowest category). If `Composition` $\ge$ 8 , we add 1 (making it 2 for those cases). If `Composition` $\ge$ 12 , we add another 1 (making it 3 for those cases that exceed both thresholds). 
+
+It’s good practice to verify that the newly created variable is correct. One way to check `Comp_ord` is by using the `tapply()` function to compute the minimum and maximum Composition within each category of `Comp_ord`:
+
+```{r}
+tapply(painters$Composition, painters$Comp_ord, min)
+tapply(painters$Composition, painters$Comp_ord, max)
+```
+
+This should confirm that for `Comp_ord` category 1, `Composition` ranges 0–7; for category 2, 8–11; and for category 3, 12–18, matching our intended cut-offs.
+
+### Creating Variables Using `ifelse()`
+
+The `ifelse()` function is a vectorized conditional function handy for creating indicator, ordinal, or categorical variables. It has the form `ifelse(test, yes, no)` , where `test` is a logical condition, `yes` is the value to return for observations where the `test` is `TRUE`, and `no` is the value to return where the `test` is
+`FALSE`. The value returned by `ifelse()` will have the same length as the `test` vector, with each element filled by either the `yes` or `no` value depending on the condition[@matloff2011art].
+
+For instance, consider again the `painters` data frame. The `School` variable in this dataset is a factor with levels A, B, C, D, E, F, G, H (denoting which art school each painter belonged to). Suppose we want to create a binary variable `School2` which equals 1 if the `school` is A, B, or C, and 2 otherwise. We can use `ifelse()` with the `%in%` operator for this set membership test:
+
+```{r}
+School2 <- ifelse(painters$School %in% c("A","B","C"), 1, 2)
+table(School2, painters$School)
+```
+
+The table above will show that for schools A, B, C we have `School2` = 1, and for the others it’s 2.
+
+We can also nest `ifelse()` statements to create variables with more than two categories. Continuing the example above, suppose we want to create `School3` such that: A/B/C map to 1, D/E map to 2, and F/G/H
+map to 3. We can nest a second `ifelse()` inside the first:
+
+```{r}
+School3 <- ifelse(painters$School %in% c("A","B","C"), 1,
+                  ifelse(painters$School %in% c("D","E"), 2, 3))
+table(School3, painters$School)
+```
+
+We see `School3` assigns 1 to A/B/C, 2 to D/E, and 3 to F/G/H as intended.
+
+### Creating Factors Using the `cut()` Function
+
+In statistical analysis, it’s often useful to convert a continuous variable into a categorical factor by binning its values into intervals. The base R function `cut()` is designed for this purpose. The `cut()` function takes a numeric vector and converts it into a factor by dividing the range of the data into intervals (bins) and
+assigning each value to a bin. 
+
+Key arguments of `cut()` include:
+
+-   `x` : the numeric vector to be binned.
+-   `breaks` : a numeric vector of cut points (of length `n+1` if you want `n` intervals), or a single number giving the number of intervals to cut `x` into.
+-   `labels` : an optional vector of labels for the resulting factor levels. If not provided, `cut` will by default label the intervals like `(a,b]` (using parentheses for open intervals and brackets for closed intervals).
+-   `include.lowest` : logical, indicating if the lowest (first) interval should be closed on the left. By default the intervals are left-open, right-closed; setting `include.lowest=TRUE` will include the minimum value of `x` in the first interval (making it `[a,b]` for the first interval).
+-   `right` : logical for whether intervals should be closed on the right (and open on the left) or vice versa. The default `right=TRUE` means intervals like `(a,b]` ; if FALSE , you get `[a,b)` style.
+
+As an example, suppose we want to categorize the painters’ `Colour` score into four groups representing quartiles (i.e., 0–25th percentile, 25–50th, 50–75th, 75–100th). We can do this by first finding the quartile cut points and then using `cut()`:
+
+```{r}
+qt <- quantile(painters$Colour, probs = c(0, 0.25, 0.5, 0.75, 1))
+qt
+```
+
+Now use these as breakpoints:
+
+```{r}
+painters$ColourCat <- cut(painters$Colour, 
+                          breaks = qt,
+                          labels =  c("first","second","third","fourth"),
+                          include.lowest = TRUE)
+table(painters$ColourCat)
+```
+
+Here “first” corresponds to the lowest quarter of `Colour` values, and “fourth” the highest quarter. We set `include.lowest = TRUE` so that the minimum value (0 in this case) is included in the lowest interval.
+
+Using `cut()` in this way allows us to introduce non-linear relationships or categorical distinctions into models (for example, using quartiles instead of a continuous variable) and to better interpret continuous variables by grouping their values into meaningful categories.
+
+## Handling Data with Duplicated Elements
+
+Data often contain duplicate records, which may occur intentionally or as errors (for instance, through data entry mistakes or merging datasets). Identifying and handling duplicates is typically part of data cleaning.
+Base R provides functions to detect and manage duplicates in vectors, matrices, and data frames.
+
+### Duplicated Elements in Vectors
+
+For vectors, the `unique()` function returns a vector of the distinct values. The companion function `duplicated()` returns a logical vector the same length as the input, indicating for each position whether
+that element is a duplicate of an earlier element. Both functions have an argument `fromLast` which, if set to `TRUE`, considers duplication from the reverse direction (this affects which element is considered the
+“first” occurrence).
+
+```{r}
+v <- c(letters[1:4], "d", "a")
+v
+unique(v)
+unique(v, fromLast = TRUE)
+```
+
+Here `unique(v)` kept the first occurrence of each letter (so we see `"a"` from position 1, not the `"a"` from the end), whereas `unique(v, fromLast=TRUE)` kept the last occurrence of each duplicate (so it
+retained the `"a"` from the end and dropped the earlier one).
+
+Now check `duplicated(v)`:
+
+```{r}
+duplicated(v)
+duplicated(v, fromLast = TRUE)
+```
+
+In the first output, the fifth element (`"d"`) and sixth element (`"a"`) are marked `TRUE` because they are duplicates of earlier elements in the vector. In the second output (`fromLast=TRUE`), it’s the first element `"a"` and fourth element `"d"` that are marked `TRUE` (because from the reverse direction, those become the "duplicate" instances).
+
+If our goal is to extract only the unique values from a vector, we can use `!duplicated()` as a filtering index:
+
+```{r}
+v[!duplicated(v)]
+v[!duplicated(v, fromLast = TRUE)]
+```
+
+The first line returns the first occurrences of each unique value (same as `unique(v)`), while the second returns the last occurrences of each unique value.
+
+### Duplicated Rows or Columns in Matrices
+
+The concepts of `unique()` and `duplicated()` extend to matrices as well, working by rows (the default, `MARGIN = 1 `). The `unique()` function will return a matrix with duplicate rows removed, and `duplicated()` will return a logical vector flagging duplicate rows. For example:
+
+```{r}
+mat <- matrix(
+  c(rep("c", 3), "d", "c", 
+    rep(c("a","b","c","c","c"), 2),
+    letters[1:3], "d", "c",
+    rep("c", 5), letters[1:3], "c", "c"),
+  ncol = 5, byrow = TRUE
+)
+mat
+unique(mat)
+duplicated(mat)
+```
+
+We see that rows 3 and 6 were duplicates of earlier rows (row 3 duplicates row 2, and row 6 duplicates row 2 as well), which is why `duplicated(mat)` flags them as TRUE . The `unique(mat)` result kept one copy of each distinct row.
+
+If we want to check for duplicated columns in a matrix, we can use the `MARGIN` argument with value 2 in `unique()` or `duplicated()` . By default, these functions act on rows (`MARGIN=1`). For example, `unique(mat, MARGIN=2)` would give the unique set of columns of the matrix, and `duplicated(mat,
+MARGIN=2)` would flag duplicate columns. In our mat example, we can test:
+
+```{r}
+unique(mat, MARGIN = 2)
+duplicated(mat, MARGIN = 2)
+```
+
+If there were any identical columns, `duplicated(mat, MARGIN=2)` would mark them. (In the constructed matrix above, each column is actually unique.)
+
+### Duplicated Records in Data Frames
+
+Working with duplicate observations in a data frame is similar to the matrix case (except we cannot use `MARGIN` to target columns in one call). The `unique()` function applied to a data frame returns the data frame with duplicate rows removed. The `duplicated()` function applied to a data frame returns a logical vector indicating which rows are duplicates of a previous row.
+
+Consider an example data frame with a patient ID, a visit number, and a score, where some patients have multiple rows (multiple visits):
+
+
+```{r}
+set.seed(5)
+dat <- data.frame(
+  ID = c(rep("A01", 3), rep("A02", 2), "A03", "A04", rep("A05", 2)),
+  visit = c(3:1, 1, 2, rep(1, 4)),
+  score = round(rnorm(9, 5, 2))
+)
+dat
+```
+
+We can see that ID A01 appears 3 times, A02 twice, A05 twice, etc. If we use `unique(dat)` , it will return a data frame with duplicate rows removed. In this example, row 9 is an exact duplicate of row 8 (same ID, visit, score), so `unique(dat)` would drop one of those:
+
+```{r}
+unique(dat)
+```
+
+Understanding these tools allows for many practical operations. For example, we can use them to extract the first or last occurrence of each group in a dataset. Returning to the `dat` example: to get each patient’s first visit and last visit, we can do the following:
+
+```{r}
+# 1. sort by ID then visit
+dat_sort <- dat[order(dat$ID, dat$visit), ]  
+# 2. first row for each ID
+first_visit <- dat_sort[!duplicated(dat_sort$ID), ] 
+first_visit
+# 3. last row for each ID
+last_visit <- dat_sort[!duplicated(dat_sort$ID, fromLast=TRUE), ] 
+last_visit
+```
+
+Let’s break down what we did:
+
+-   We sorted the data frame by ID and then by visit number, storing it in `dat_sort` . This ensures that for each patient ID, the visits are in chronological order.
+-   `!duplicated(dat_sort$ID)` gives `TRUE` for the first occurrence of each unique ID (since the data is sorted, that will be the earliest visit for each patient). Subsetting `dat_sort` with this returns the first visit for each patient.
+-   Similarly, using `duplicated(dat_sort$ID, fromLast=TRUE)` identifies the last occurrence of each ID (the last visit in order), and negating it (`!`) flags those last occurrences. Subsetting gives us the last visit for each patient.
+
+Another scenario is splitting a dataset into two: one containing only individuals with multiple records, and one containing individuals with a single record. Using the `dat` example, we could do:
+
+```{r}
+# IDs that appear more than once
+dup_IDs <- dat$ID[duplicated(dat$ID)] 
+# all rows for IDs with duplicates
+multi_record_df <- dat[dat$ID %in% dup_IDs, ] 
+multi_record_df
+# rows for IDs that appear only once
+single_record_df <- dat[!dat$ID %in% dup_IDs, ] 
+single_record_df
+```
+
+In our data, `dup_IDs` would include "A01", "A02", "A05". Thus, `multi_record_df` will contain all records for those IDs, and `single_record_df` will contain the records for A03 and A04 (the IDs that occur only once).
+
+## Merging Data Frames
+
+Merging data is crucial for combining information from various sources, enabling us to uncover hidden patterns and relationships. It facilitates comprehensive analysis by integrating diverse datasets, leading to more informed decisions and deeper insights into the underlying phenomena.
+
+In base R, the primary tool for merging data frames is the `merge()` function. This function allows us to join two data frames based on one or more common key variables.
+
+For example, suppose we have two data frames we want to merge by an `id` column:
+
+```{r}
+data1 <- data.frame(
+id = c(2, 1, 3),
+var1 = c("A", "B", "C")
+)
+data1
+data2 <- data.frame(
+id = c(3, 4, 1),
+var2 = c(1, 3, 9)
+)
+data2
+```
+
+Merging them by `id` will now result in a data frame that includes only the rows with matching `id` values in both data frames.
+
+```{r}
+result <- merge(data1, data2, by = "id")
+result
+```
+
+By default, `merge()` performs an inner join (keeping only matching rows). We can change this behavior with the arguments `all.x` , `all.y` , or `all` :
+
+-   `all.x = TRUE`: keeps all rows from the first data frame (a left join).
+-   `all.y = TRUE`: keeps all rows from the second data frame (a right join).
+-   `all = TRUE`: keeps all rows from both (a full outer join), inserting `NA` for missing matches.
+
+For instance, using the same `data1` and `data2`:
+
+```{r}
+merge(data1, data2, by = "id", all.x = TRUE)
+```
+
+In the example above, every `id` from `data1` is retained. Notice id 2  had no match in `data2`, resulting in `NA` for `var2`. Similarly:
+
+```{r}
+merge(data1, data2, by = "id", all.y = TRUE)
+```
+
+And setting `all = TRUE` keeps all ids from both:
+
+```{r}
+merge(data1, data2, by = "id", all = TRUE)
+```
+
+Notice how id 4 (which was only in `data2`) and id 2 (only in `data1`) are included, with missing values filled in for the other data frame’s fields.
+
+
+If the key columns have different names in the two data frames, we can use `by.x` and `by.y` to specify them. For example, if `data2` had the identifier in a column named `ID` (capital letters) instead of `id` , we could do:
+
+```{r}
+data3 <- data.frame(
+  ID = c(1, 3, 4),
+  var2 = c(1, 8, 9)
+)
+merge(data2, data3, by.x = "id", by.y = "ID")
+```
+
+The command above merges data2 and data3 by matching `data2$id` to `data3$ID`. The result’s column names for the merged key will default to `id` (the name in the first data frame `data2`), and since both data frames had a `var2` column, the output will have `var2.x` and `var2.y` to distinguish them. 
+
+In this example, `.x` and `.y` suffixes were auto-appended to distinguish the two `var2` columns that came from `data2` and `data3`. We can customize these suffixes using the `suffixes` argument if desired:
+
+```{r}
+merge(data2, data3, by.x="id", by.y="ID", suffixes=c(".data2",".data3"))
+```
+
+Merging data frames in base R using `merge()` is quite powerful for relational operations. It’s worth noting, however, that there are other packages and tools (such as `dplyr` from the `tidyverse`, or the `data.table` package) that provide alternative syntax and potentially faster performance for merging and
+joining operations. 
+
+## Reshaping Data
+
+In data analysis, we often need to transform datasets between wide format and long format (and vice versa), or otherwise rearrange the shape of our data.
+
+Base R provides several functions for reshaping data,
+including `stack()`, `unstack()`, and the more general `reshape()` function. These functions allow us to reorganize data frames or vectors without losing information, only changing how that information is structured. Many modern R packages such as `tidyr` also offer powerful data reshaping tools, but we will focus on base R here.
+
+### Stacking and Unstacking Data
+
+The functions `stack()` and `unstack()` provide a convenient way to convert data between *long* and *wide* formats when the dataset is relatively simple. *Stacking* means taking data that is spread across multiple columns and stacking them into a single column (creating a longer, narrower dataset). *Unstacking* is the opposite: taking data from a single column that includes observations from multiple groups and spreading it out into separate columns (creating a wider dataset).
+
+In base R, `stack(x)` takes a data frame or list `x` and concatenates the values into one long vector, while also creating an index that indicates the source column for each value . The result of `stack()` is a data frame with two columns: one named `values` (the stacked values) and one named `ind` (a factor indicating which column the value came from) . Conversely, `unstack()` takes such a stacked data frame (or a similar structure) and spreads it back out into separate vectors for each category.
+
+To illustrate, consider the built-in dataset `InsectSprays` , which is in long format (one observation per row, with a factor indicating spray type). If we wanted a wide format with one column per spray type, we could unstack it. Conversely, if we start with the wide form, we could stack it back to long. The following example demonstrates unstacking:
+
+```{r}
+str(InsectSprays)
+head(InsectSprays)
+wideDF <- unstack(InsectSprays)
+wideDF
+```
+
+Here, `unstack(InsectSprays)` produced a data frame with separate columns `A`, `B`, `C`, `D`, `E`, `F` for each spray type, each column containing the count values. Essentially, it turned the balanced long format into a wide format. This works because the original data had the same number of observations for each spray type (a balanced design) [@braun_r_intro].
+
+If we `stack()` that wide data frame (or the original wide form, if we had it), we should get back to the long format. For instance:
+
+```{r}
+stackedDF <- stack(wideDF)
+head(stackedDF)
+```
+
+The `stack()` function in base R stacks only plain atomic vector columns — that is, columns for which `is.vector()` returns TRUE, such as numeric, character, or logical vectors. Columns with additional class attributes, like `factors` or `matrices`, are ignored with a warning, even though they are technically atomic under the hood. Additionally, when stacking columns of mixed types (e.g., numeric and character), R will coerce them to a common type, usually character, to ensure the `values` column remains consistent. For example:
+
+```{r, warning=TRUE}
+df <- data.frame(
+  a = 1:3,
+  b = letters[1:3],
+  c = factor(c("low", "medium", "high")),
+  d = c(T, F, T)
+)
+stack(df)
+```
+
+
+The `unstack(x, form)` function in base R reshapes a data frame from long to wide format using a formula interface. The formula should be written as `value ~ group`, where `value` is the column containing the measurements, and `group` is the column whose unique values will become new column names.
+
+For example, suppose we have the following long-format data frame:
+
+```{r}
+df <- data.frame(
+  person = rep(c("A", "B", "C"), each = 2),
+  variable = rep(c("height", "weight"), times = 3),
+  value = c(160, 55, 170, 65, 180, 75)
+)
+```
+
+The function `unstack(df, value ~ variable)` spreads the value column into separate columns based on the variable column (`height` and `weight`):
+
+```{r}
+unstack(df, value ~ variable)
+```
+
+Alternatively, using `unstack(df, value ~ person)` spreads the values into columns named after each person (`A`, `B`, `C`):
+
+```{r}
+unstack(df, value ~ person)
+```
+
+If the data is in stacked format (e.g., created directly by `stack()`), then `unstack()` can be called without a formula.
+
+### Reshaping Data Frames with `reshape()`
+
+For more complex data rearrangements, base R provides the `reshape()` function. The `reshape()` function is more general than `stack()` / `unstack()` and can handle conversions of data frames from long format to wide format and vice versa, even in cases where `stack()` / `unstack()` are not sufficient (for example, when there are multiple measured variables or an unbalanced structure). 
+
+The `reshape()` function in base R works by specifying certain key arguments:
+
+-   `data` : the data frame to reshape.
+-   `direction` : `"wide"` or `"long"` indicating which way you want to reshape the data.
+
+For reshaping to wide, you’ll specify:
+
+-   `idvar` : one or more columns that identify the subject or observational unit (that stay the same for all reshaped rows).
+-   `timevar` : the name of the column that indicates the time or occasion (whose values will become suffixes in wide format).
+
+For reshaping to long, you’ll need to specify the opposite: which columns in wide form should be gathered into a single column, and how to name the resulting long-form identifiers.
+
+-   `varying` : a key argument in `reshape()` which specifies the names of multiple columns that correspond to the same variable measured at different times. It can be a list of vectors of names (or indices) of the columns that go together.
+
+
+The usage can be a bit complex at first. Let’s illustrate with an example. Suppose we have a data frame in *wide* format for an experiment where each subject (`id`) is measured at two time points on a variable
+`score` . Our wide data might look like:
+
+```{r}
+wideDF <- data.frame(
+  id = 1:3,
+  score_time1 = c(5, 3, 4),
+  score_time2 = c(6, 2, 4)
+)
+wideDF
+```
+
+Here each row is a subject, and the measurements at time1 and time2 are in separate columns. To reshape this to long format (one row per subject per time), we can use r`eshape()`:
+
+```{r}
+longDF <- reshape(wideDF, 
+                  direction = "long",
+                  idvar = "id", 
+                  timevar = "time",
+                  varying = c("score_time1", "score_time2"),
+                  v.names = "score")
+longDF
+```
+
+
+
+In the call above: 
+
+-   `idvar = "id"` tells `reshape()` that `“id”` identifies a subject (stays constant across reshaped rows belonging to the same subject). 
+-   `timevar = "time"` means we will create a new column named `time` to indicate the time point. 
+-   `varying = c("score_time1","score_time2")` tells which columns in wide form contain the measurements that need to be stacked. Here we have two such columns.
+-   `v.names = "score"` sets the name of the measurement variable in the long form.
+
+In the result, each subject now has two rows: time = 1 and time = 2, with their corresponding scores. By default, `reshape()` uses the numeric suffixes from `score_time1` and `score_time2` to determine the values of the new time variable. If those suffixes were non-numeric or ambiguous, we could use the times argument (e.g., `times = c(1, 2)`) to explicitly define the time values.
+
+Now, `reshape()` can go the other way as well. If we start with a long dataset, we can cast it to wide by specifying `direction = "wide"` and appropriate id and time variables. For example, we can reshape `longDF` back to wide format as follows:
+
+```{r}
+wideDF2 <- reshape(longDF, 
+                   direction = "wide", 
+                   idvar = "id", 
+                   timevar = "time")
+wideDF2
+```
+
+The names `score.1` and `score.2` are the default naming convention indicating `score` at time 1 and time 2. We could change the separator by specifying the `sep` argument.
+
+The base R `reshape()` function is powerful but can be confusing. It requires carefully specifying the identifiers and varying columns. Modern packages (like `reshape2` or `tidyr`) provide simpler functions (`melt()`, `dcast()` or `pivot_longer()`, `pivot_wider()`) which are often easier to use for these tasks. 
+
+## Aggregating Data
+
+In data analysis, we frequently need to aggregate data — that is, to summarize or collapse detailed observations into higher-level summaries. Examples include calculating the average income by country, total sales by quarter, or the minimum and maximum values within categories. Base R provides several functions for group-wise computations: `tapply()`, `aggregate()`, `by()`, and `ave()` are among the most commonly used. We have already introduced `tapply()` in a previous chapter, so in this section, we will focus on the remaining three — each with its own use case and output format, depending on the structure of the data and the desired result.
+
+Before diving into each function, note that all these functions ultimately achieve a “split-apply-combine” strategy: they split data into groups based on some factor or categorical variable, apply a function to each
+group, and then combine the results.
+
+### Aggregation with `aggregate()`
+
+The `aggregate()` function is a data-frame-oriented alternative to `tapply()`. It can handle multiple columns at once and returns a data frame as output, making it convenient for further data manipulation or merging. In contrast, `tapply()` is typically used for applying a function to a numeric vector split by one or more factors, and it returns an array or vector, depending on the input.
+
+The basic usage is `aggregate(x, by, FUN)` where: 
+
+-   `x` is the data to aggregate. This can be a vector or a data frame 
+-   `by` is a list of grouping variables or a formula specifying the grouping. -    `FUN` is the function to apply.
+
+Consider the built-in `iris` dataset, which contains the measurements in centimeters of the variables sepal length and width and petal length and width, respectively, for 50 flowers from each of 3 species of iris.
+
+```{r}
+head(iris)
+```
+
+
+For example, using the `iris` data, we can get the mean of sepal length by species, by specifying `Sepal.Length ~ Species`, in aggregate():
+
+```{r}
+aggregate(Sepal.Length ~ Species, data = iris, FUN = mean)
+```
+
+Here aggregate has created a data frame with one row per Species and a column for the mean `Sepal.Length`.
+
+We can also aggregate multiple measurements simultaneously. For instance, to compute the mean and standard deviation of both `Sepal.Length` and `Sepal.Width` by species, we use `cbind()` on the left side of the tilde (`~`) to combine the variables, and apply a user-defined function:
+
+```{r}
+aggregate(cbind(Sepal.Length, Sepal.Width) ~ Species, iris, 
+          \(x){
+            c(Mean = mean(x), SD = sd(x))
+          })
+```
+
+
+If we want to aggregate by multiple factors (say we had another factor like `Species` and `SomeFactor`), we could write:
+
+```{r, eval=FALSE}
+aggregate(Sepal.Length ~ Species + SomeFactor, data = iris, FUN = mean)
+```
+
+`aggregate()` has a formula method and a default method. You can also call it like:
+
+```{r}
+aggregate(x = iris[, 1:4], by = list(Species = iris$Species), FUN = mean)
+```
+
+Here we explicitly pass a data frame of the first four columns of iris as `x`, and a list containing the grouping factor (with a name `"Species"`). 
+
+### Applying Functions by Group with `by()`
+
+The function `by()` is another approach to group-wise operations. The usage is `by(data, INDICES, FUN, ...)` , where: 
+
+-   `data` is typically a data frame. 
+-   `INDICES` is a factor or list of factors by which to split the data frame. -   `FUN` is the function to apply to each subset of the data frame.
+
+The `by()` function will split the data frame by the factor(s) you provide, apply the function to each subset, and return an object of class `"by"` . When printed, this object shows the results for each group in a neat format.
+
+For instance, using the `iris` data, if we want to get summary statistics of the numeric variables for each Species, we could do:
+
+```{r}
+by(iris[, 1:4], iris$Species, summary)
+```
+
+The main difference between `by()` and `aggregate()` lies in their output. Both functions split data into groups based on a factor and apply a function to each group. However, `aggregate()` returns a data frame, making it easier to use for further data manipulation. In contrast, `by()` returns a list-like `"by"` object, which can be useful for printing or inspecting group-specific results but may require additional steps if you want to combine or reshape the output for downstream analysis.
+
+
+### Computing Group Summaries with `ave()`
+
+While functions like `tapply()` and `aggregate()` produce one summary value per group, there are situations where we want to compute a group summary but retain the full length of the original data. This is useful when we want to annotate each observation with a statistic derived from its group, such as the group mean. The `ave()` function is designed specifically for this purpose.
+
+The `ave()` function takes a vector `x`, splits it according to the grouping factor(s), applies a function `FUN` (default is mean), and returns a vector of the same length as `x` where each element is replaced by the computed group summary. This makes it especially handy for adding new columns to data frames based on group-level statistics.
+
+For example, consider a data frame of test scores for students across  different classes:
+
+```{r}
+students <- data.frame(
+  class = c("A", "A", "B", "B", "B", "A"),
+  score = c(85, 90, 78, 88, 84, 92)
+)
+students
+```
+
+We can compute the class average for each student and store it in a new column using `ave()`:
+
+```{r}
+students$class_avg <- ave(students$score, students$class, FUN=mean)
+students
+```
+
+Now each student has a `class_avg` value corresponding to the mean score of their class. This technique is useful for comparisons, standardization, or visualization.
+
+Although the default function for `ave()` is mean, you can supply other summary functions like `median`, `sd`, or even custom ones as long as the function returns a single value per group. However, avoid using functions that return multiple values (like range), since a`ve()` expects only one summary value per group.
+
+In summary, `ave()` is a convenient way to create group-based summary columns that align with the structure of the original data. It complements other aggregation functions by expanding the result across the full dataset instead of collapsing it.
+
+
+
