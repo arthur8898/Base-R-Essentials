@@ -652,8 +652,8 @@ School3  A  B  C  D  E  F  G  H
 <p>For example, suppose we have two data frames we want to merge by an <code>id</code> column:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="at">id =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>),</span>
-<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="at">var1 =</span> <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>, <span class="dv">3</span>),</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">var1 =</span> <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>)</span>
 <span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>data1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -663,8 +663,8 @@ School3  A  B  C  D  E  F  G  H
 3  3    C</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="at">id =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">1</span>),</span>
-<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="at">var2 =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">9</span>)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">1</span>),</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">var2 =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">9</span>)</span>
 <span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>data2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -673,10 +673,7 @@ School3  A  B  C  D  E  F  G  H
 2  4    3
 3  1    9</code></pre>
 </div>
-</div>
-<p>Merging them by <code>id</code> will now result in a data frame that includes only the rows with matching <code>id</code> values in both data frames.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">merge</span>(data1, data2, <span class="at">by =</span> <span class="st">"id"</span>)</span>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">merge</span>(data1, data2)</span>
 <span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  id var1 var2
@@ -684,7 +681,8 @@ School3  A  B  C  D  E  F  G  H
 2  3    C    1</code></pre>
 </div>
 </div>
-<p>By default, <code>merge()</code> performs an inner join (keeping only matching rows). We can change this behavior with the arguments <code>all.x</code> , <code>all.y</code> , or <code>all</code> :</p>
+<p>By default, data frames are merged using the columns with common names in both data frames. You can also specify the variable or variables explicitly with the <code>by</code> argument, such as <code>by = "id"</code>. In this example, merging the two data frames by <code>id</code> results in a data frame that includes only the rows with matching <code>id</code> values in both data frames.</p>
+<p>The <code>merge()</code> function performs an inner join (keeping only matching rows) by default. We can change this behavior with the arguments <code>all.x</code> , <code>all.y</code> , or <code>all</code> :</p>
 <ul>
 <li><code>all.x = TRUE</code>: keeps all rows from the first data frame (a left join).</li>
 <li><code>all.y = TRUE</code>: keeps all rows from the second data frame (a right join).</li>
@@ -728,7 +726,8 @@ School3  A  B  C  D  E  F  G  H
 <span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">ID =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">4</span>),</span>
 <span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">var2 =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">8</span>, <span class="dv">9</span>)</span>
 <span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a><span class="fu">merge</span>(data2, data3, <span class="at">by.x =</span> <span class="st">"id"</span>, <span class="at">by.y =</span> <span class="st">"ID"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb67-5"><a href="#cb67-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb67-6"><a href="#cb67-6" aria-hidden="true" tabindex="-1"></a><span class="fu">merge</span>(data2, data3, <span class="at">by.x =</span> <span class="st">"id"</span>, <span class="at">by.y =</span> <span class="st">"ID"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  id var2.x var2.y
 1  1      9      1
@@ -739,7 +738,8 @@ School3  A  B  C  D  E  F  G  H
 <p>The command above merges data2 and data3 by matching <code>data2$id</code> to <code>data3$ID</code>. The result’s column names for the merged key will default to <code>id</code> (the name in the first data frame <code>data2</code>), and since both data frames had a <code>var2</code> column, the output will have <code>var2.x</code> and <code>var2.y</code> to distinguish them.</p>
 <p>In this example, <code>.x</code> and <code>.y</code> suffixes were auto-appended to distinguish the two <code>var2</code> columns that came from <code>data2</code> and <code>data3</code>. We can customize these suffixes using the <code>suffixes</code> argument if desired:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">merge</span>(data2, data3, <span class="at">by.x=</span><span class="st">"id"</span>, <span class="at">by.y=</span><span class="st">"ID"</span>, <span class="at">suffixes=</span><span class="fu">c</span>(<span class="st">".data2"</span>,<span class="st">".data3"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">merge</span>(data2, data3, <span class="at">by.x=</span><span class="st">"id"</span>, <span class="at">by.y=</span><span class="st">"ID"</span>,</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>      <span class="at">suffixes=</span><span class="fu">c</span>(<span class="st">".data2"</span>,<span class="st">".data3"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  id var2.data2 var2.data3
 1  1          9          1
@@ -816,7 +816,15 @@ School3  A  B  C  D  E  F  G  H
 <span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">c =</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"low"</span>, <span class="st">"medium"</span>, <span class="st">"high"</span>)),</span>
 <span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">d =</span> <span class="fu">c</span>(T, F, T)</span>
 <span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a><span class="fu">stack</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-8"><a href="#cb79-8" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  a b      c     d
+1 1 a    low  TRUE
+2 2 b medium FALSE
+3 3 c   high  TRUE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stack</span>(df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in stack.data.frame(df): non-vector columns will be ignored</code></pre>
 </div>
@@ -836,15 +844,26 @@ School3  A  B  C  D  E  F  G  H
 <p>The <code>unstack(x, form)</code> function in base R reshapes a data frame from long to wide format using a formula interface. The formula should be written as <code>value ~ group</code>, where <code>value</code> is the column containing the measurements, and <code>group</code> is the column whose unique values will become new column names.</p>
 <p>For example, suppose we have the following long-format data frame:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">person =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>), <span class="at">each =</span> <span class="dv">2</span>),</span>
-<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">variable =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"height"</span>, <span class="st">"weight"</span>), <span class="at">times =</span> <span class="dv">3</span>),</span>
-<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(<span class="dv">160</span>, <span class="dv">55</span>, <span class="dv">170</span>, <span class="dv">65</span>, <span class="dv">180</span>, <span class="dv">75</span>)</span>
-<span id="cb82-5"><a href="#cb82-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">person =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>), <span class="at">each =</span> <span class="dv">2</span>),</span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">variable =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"height"</span>, <span class="st">"weight"</span>), <span class="at">times =</span> <span class="dv">3</span>),</span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">value =</span> <span class="fu">c</span>(<span class="dv">160</span>, <span class="dv">55</span>, <span class="dv">170</span>, <span class="dv">65</span>, <span class="dv">180</span>, <span class="dv">75</span>)</span>
+<span id="cb84-5"><a href="#cb84-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb84-6"><a href="#cb84-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb84-7"><a href="#cb84-7" aria-hidden="true" tabindex="-1"></a>df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  person variable value
+1      A   height   160
+2      A   weight    55
+3      B   height   170
+4      B   weight    65
+5      C   height   180
+6      C   weight    75</code></pre>
+</div>
 </div>
 <p>The function <code>unstack(df, value ~ variable)</code> spreads the value column into separate columns based on the variable column (<code>height</code> and <code>weight</code>):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unstack</span>(df, value <span class="sc">~</span> variable)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unstack</span>(df, value <span class="sc">~</span> variable)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  height weight
 1    160     55
@@ -854,7 +873,7 @@ School3  A  B  C  D  E  F  G  H
 </div>
 <p>Alternatively, using <code>unstack(df, value ~ person)</code> spreads the values into columns named after each person (<code>A</code>, <code>B</code>, <code>C</code>):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unstack</span>(df, value <span class="sc">~</span> person)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unstack</span>(df, value <span class="sc">~</span> person)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    A   B   C
 1 160 170 180
@@ -865,29 +884,26 @@ School3  A  B  C  D  E  F  G  H
 </section>
 <section id="reshaping-data-frames-with-reshape" class="level3" data-number="7.4.2">
 <h3 data-number="7.4.2" class="anchored" data-anchor-id="reshaping-data-frames-with-reshape"><span class="header-section-number">7.4.2</span> Reshaping Data Frames with <code>reshape()</code></h3>
-<p>For more complex data rearrangements, base R provides the <code>reshape()</code> function. The <code>reshape()</code> function is more general than <code>stack()</code> / <code>unstack()</code> and can handle conversions of data frames from long format to wide format and vice versa, even in cases where <code>stack()</code> / <code>unstack()</code> are not sufficient (for example, when there are multiple measured variables or an unbalanced structure).</p>
-<p>The <code>reshape()</code> function in base R works by specifying certain key arguments:</p>
+<p>The <code>reshape()</code> function in base R is a flexible tool for converting data frames between wide and long formats, handling complex rearrangements that simpler functions like <code>stack()</code> or <code>unstack()</code> may not manage (e.g., multiple measured variables or unbalanced data).</p>
+<p>Key Arguments for <code>reshape()</code>:</p>
 <ul>
-<li><code>data</code> : the data frame to reshape.</li>
-<li><code>direction</code> : <code>"wide"</code> or <code>"long"</code> indicating which way you want to reshape the data.</li>
+<li><code>data</code>: The data frame to reshape.</li>
+<li><code>direction</code>: <code>"long"</code> to stack multiple columns into one, or <code>"wide"</code> to spread one column into multiple.</li>
+<li><code>idvar</code>: Column(s) identifying the observational unit (e.g., subject ID) that stay constant.</li>
+<li><code>timevar</code>: Column indicating the time or occasion, whose values become suffixes in wide format or a new column in long format.</li>
+<li><code>varying</code>: For <em>wide-to-long</em>, a vector or list of column names to stack into a single column. For <em>long-to-wide</em>, this is often inferred.</li>
+<li><code>v.names</code>: The name of the measurement variable in long format.</li>
 </ul>
-<p>For reshaping to wide, you’ll specify:</p>
-<ul>
-<li><code>idvar</code> : one or more columns that identify the subject or observational unit (that stay the same for all reshaped rows).</li>
-<li><code>timevar</code> : the name of the column that indicates the time or occasion (whose values will become suffixes in wide format).</li>
-</ul>
-<p>For reshaping to long, you’ll need to specify the opposite: which columns in wide form should be gathered into a single column, and how to name the resulting long-form identifiers.</p>
-<ul>
-<li><code>varying</code> : a key argument in <code>reshape()</code> which specifies the names of multiple columns that correspond to the same variable measured at different times. It can be a list of vectors of names (or indices) of the columns that go together.</li>
-</ul>
-<p>The usage can be a bit complex at first. Let’s illustrate with an example. Suppose we have a data frame in <em>wide</em> format for an experiment where each subject (<code>id</code>) is measured at two time points on a variable <code>score</code> . Our wide data might look like:</p>
+<p><strong>Example: Wide to Long Format</strong></p>
+<p>Suppose we have a wide data frame where each subject (<code>id</code>) has scores measured at two time points (<code>score_time1</code>, <code>score_time2</code>):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a>wideDF <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
-<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">score_time1 =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">4</span>),</span>
-<span id="cb87-4"><a href="#cb87-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">score_time2 =</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">2</span>, <span class="dv">4</span>)</span>
-<span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb87-6"><a href="#cb87-6" aria-hidden="true" tabindex="-1"></a>wideDF</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>wideDF <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">score_time1 =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">4</span>),</span>
+<span id="cb90-4"><a href="#cb90-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">score_time2 =</span> <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">2</span>, <span class="dv">4</span>)</span>
+<span id="cb90-5"><a href="#cb90-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb90-6"><a href="#cb90-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb90-7"><a href="#cb90-7" aria-hidden="true" tabindex="-1"></a>wideDF</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  id score_time1 score_time2
 1  1           5           6
@@ -895,15 +911,15 @@ School3  A  B  C  D  E  F  G  H
 3  3           4           4</code></pre>
 </div>
 </div>
-<p>Here each row is a subject, and the measurements at time1 and time2 are in separate columns. To reshape this to long format (one row per subject per time), we can use r<code>eshape()</code>:</p>
+<p>To reshape this to long format (one row per subject per time point), use <code>reshape()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>longDF <span class="ot">&lt;-</span> <span class="fu">reshape</span>(wideDF, </span>
-<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">direction =</span> <span class="st">"long"</span>,</span>
-<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">idvar =</span> <span class="st">"id"</span>, </span>
-<span id="cb89-4"><a href="#cb89-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">timevar =</span> <span class="st">"time"</span>,</span>
-<span id="cb89-5"><a href="#cb89-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">varying =</span> <span class="fu">c</span>(<span class="st">"score_time1"</span>, <span class="st">"score_time2"</span>),</span>
-<span id="cb89-6"><a href="#cb89-6" aria-hidden="true" tabindex="-1"></a>                  <span class="at">v.names =</span> <span class="st">"score"</span>)</span>
-<span id="cb89-7"><a href="#cb89-7" aria-hidden="true" tabindex="-1"></a>longDF</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>longDF1 <span class="ot">&lt;-</span> <span class="fu">reshape</span>(wideDF, </span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">direction =</span> <span class="st">"long"</span>,</span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">idvar =</span> <span class="st">"id"</span>, </span>
+<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">timevar =</span> <span class="st">"time"</span>,</span>
+<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">varying =</span> <span class="fu">c</span>(<span class="st">"score_time1"</span>, <span class="st">"score_time2"</span>),</span>
+<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">v.names =</span> <span class="st">"score"</span>)</span>
+<span id="cb92-7"><a href="#cb92-7" aria-hidden="true" tabindex="-1"></a>longDF1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    id time score
 1.1  1    1     5
@@ -914,21 +930,40 @@ School3  A  B  C  D  E  F  G  H
 3.2  3    2     4</code></pre>
 </div>
 </div>
-<p>In the call above:</p>
+<p>Here:</p>
 <ul>
-<li><code>idvar = "id"</code> tells <code>reshape()</code> that <code>“id”</code> identifies a subject (stays constant across reshaped rows belonging to the same subject).</li>
-<li><code>timevar = "time"</code> means we will create a new column named <code>time</code> to indicate the time point.</li>
-<li><code>varying = c("score_time1","score_time2")</code> tells which columns in wide form contain the measurements that need to be stacked. Here we have two such columns.</li>
-<li><code>v.names = "score"</code> sets the name of the measurement variable in the long form.</li>
+<li><code>idvar = "id"</code>: Keeps id constant for each subject.</li>
+<li><code>timevar = "time"</code>: Creates a new column time with values (1, 2) from the suffixes of <code>score_time1</code> and <code>score_time2</code>.</li>
+<li><code>varying = c("score_time1", "score_time2")</code>: Specifies columns to stack into one.</li>
+<li><code>v.names = "score"</code>: Names the stacked measurement column score.</li>
 </ul>
-<p>In the result, each subject now has two rows: time = 1 and time = 2, with their corresponding scores. By default, <code>reshape()</code> uses the numeric suffixes from <code>score_time1</code> and <code>score_time2</code> to determine the values of the new time variable. If those suffixes were non-numeric or ambiguous, we could use the times argument (e.g., <code>times = c(1, 2)</code>) to explicitly define the time values.</p>
-<p>Now, <code>reshape()</code> can go the other way as well. If we start with a long dataset, we can cast it to wide by specifying <code>direction = "wide"</code> and appropriate id and time variables. For example, we can reshape <code>longDF</code> back to wide format as follows:</p>
+<p>The result has two rows per subject: one for <code>time = 1</code> and one for <code>time = 2</code>, with corresponding scores. If column suffixes aren’t numeric (e.g., <code>score_pre</code>, <code>score_post</code>), use <code>times = c("pre", "post")</code> to define time values explicitly. For example:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>wideDF2 <span class="ot">&lt;-</span> <span class="fu">reshape</span>(longDF, </span>
-<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">direction =</span> <span class="st">"wide"</span>, </span>
-<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">idvar =</span> <span class="st">"id"</span>, </span>
-<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">timevar =</span> <span class="st">"time"</span>)</span>
-<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a>wideDF2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>longDF2 <span class="ot">&lt;-</span> <span class="fu">reshape</span>(wideDF, </span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">direction =</span> <span class="st">"long"</span>,</span>
+<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">idvar =</span> <span class="st">"id"</span>, </span>
+<span id="cb94-4"><a href="#cb94-4" aria-hidden="true" tabindex="-1"></a>                   <span class="at">timevar =</span> <span class="st">"time"</span>,</span>
+<span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">times =</span> <span class="fu">c</span>(<span class="st">"pre"</span>, <span class="st">"post"</span>),</span>
+<span id="cb94-6"><a href="#cb94-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">varying =</span> <span class="fu">c</span>(<span class="st">"score_time1"</span>, <span class="st">"score_time2"</span>),</span>
+<span id="cb94-7"><a href="#cb94-7" aria-hidden="true" tabindex="-1"></a>                   <span class="at">v.names =</span> <span class="st">"score"</span>)</span>
+<span id="cb94-8"><a href="#cb94-8" aria-hidden="true" tabindex="-1"></a>longDF2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       id time score
+1.pre   1  pre     5
+2.pre   2  pre     3
+3.pre   3  pre     4
+1.post  1 post     6
+2.post  2 post     2
+3.post  3 post     4</code></pre>
+</div>
+</div>
+<p><strong>Example: Long to Wide Format</strong></p>
+<p>Now, let’s reshape the longDF back to wide format:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reshape</span>(longDF1, </span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">direction =</span> <span class="st">"wide"</span>, </span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">idvar =</span> <span class="st">"id"</span>, </span>
+<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">timevar =</span> <span class="st">"time"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    id score.1 score.2
 1.1  1       5       6
@@ -936,8 +971,21 @@ School3  A  B  C  D  E  F  G  H
 3.1  3       4       4</code></pre>
 </div>
 </div>
-<p>The names <code>score.1</code> and <code>score.2</code> are the default naming convention indicating <code>score</code> at time 1 and time 2. We could change the separator by specifying the <code>sep</code> argument.</p>
-<p>The base R <code>reshape()</code> function is powerful but can be confusing. It requires carefully specifying the identifiers and varying columns. Modern packages (like <code>reshape2</code> or <code>tidyr</code>) provide simpler functions (<code>melt()</code>, <code>dcast()</code> or <code>pivot_longer()</code>, <code>pivot_wider()</code>) which are often easier to use for these tasks.</p>
+<p>Here, <code>reshape()</code> spreads the score column into <code>score.1</code> and <code>score.2</code> based on time values. You can customize the column name separator with the <code>sep</code> argument. For example:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reshape</span>(longDF2, </span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">direction =</span> <span class="st">"wide"</span>, </span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">idvar =</span> <span class="st">"id"</span>, </span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">timevar =</span> <span class="st">"time"</span>,</span>
+<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">sep =</span> <span class="st">"_"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      id score_pre score_post
+1.pre  1         5          6
+2.pre  2         3          2
+3.pre  3         4          4</code></pre>
+</div>
+</div>
+<p>The <code>reshape()</code> function is powerful but can be tricky due to its need for precise argument specification. Modern packages like <code>tidyr</code> (<code>pivot_longer()</code>, <code>pivot_wider()</code>) or <code>reshape2</code> (<code>melt()</code>, <code>dcast()</code>) often provide simpler alternatives for reshaping tasks.</p>
 </section>
 </section>
 <section id="aggregating-data" class="level2" data-number="7.5">
@@ -946,15 +994,9 @@ School3  A  B  C  D  E  F  G  H
 <p>Before diving into each function, note that all these functions ultimately achieve a “split-apply-combine” strategy: they split data into groups based on some factor or categorical variable, apply a function to each group, and then combine the results.</p>
 <section id="aggregation-with-aggregate" class="level3" data-number="7.5.1">
 <h3 data-number="7.5.1" class="anchored" data-anchor-id="aggregation-with-aggregate"><span class="header-section-number">7.5.1</span> Aggregation with <code>aggregate()</code></h3>
-<p>The <code>aggregate()</code> function is a data-frame-oriented alternative to <code>tapply()</code>. It can handle multiple columns at once and returns a data frame as output, making it convenient for further data manipulation or merging. In contrast, <code>tapply()</code> is typically used for applying a function to a numeric vector split by one or more factors, and it returns an array or vector, depending on the input.</p>
-<p>The basic usage is <code>aggregate(x, by, FUN)</code> where:</p>
-<ul>
-<li><code>x</code> is the data to aggregate. This can be a vector or a data frame</li>
-<li><code>by</code> is a list of grouping variables or a formula specifying the grouping. - <code>FUN</code> is the function to apply.</li>
-</ul>
-<p>Consider the built-in <code>iris</code> dataset, which contains the measurements in centimeters of the variables sepal length and width and petal length and width, respectively, for 50 flowers from each of 3 species of iris.</p>
+<p>The <code>aggregate()</code> function in base R is a powerful tool for summarizing data frames, offering a data-frame-oriented alternative to <code>tapply()</code>. Unlike <code>tapply()</code>, which applies a function to a vector split by factors and returns an array or vector, <code>aggregate()</code> handles multiple columns and returns a data frame, ideal for further manipulation or merging. The <code>aggregate()</code> function has two main methods: the formula method (using a formula like <code>y ~ group</code>) and the default method (using <code>x</code>, <code>by</code>, <code>FUN</code>). Below, we explain both methods and provide examples using the <code>iris</code> dataset, which contains measurements (e.g., <code>Sepal.Length</code>, <code>Sepal.Width</code>) for 50 flowers from each of three <code>iris</code> species.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(iris)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(iris)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
 1          5.1         3.5          1.4         0.2  setosa
@@ -965,9 +1007,18 @@ School3  A  B  C  D  E  F  G  H
 6          5.4         3.9          1.7         0.4  setosa</code></pre>
 </div>
 </div>
-<p>For example, using the <code>iris</code> data, we can get the mean of sepal length by species, by specifying <code>Sepal.Length ~ Species</code>, in aggregate():</p>
+<p><strong>Formula Method</strong></p>
+<p>The formula method uses a<code>ggregate(formula, data, FUN)</code>, where:</p>
+<ul>
+<li><code>formula</code>: Specifies the variable(s) to aggregate and grouping factor(s), e.g., <code>y ~ group</code> or <code>cbind(y1, y2) ~ group</code>.</li>
+<li><code>data</code>: The data frame containing the variables.</li>
+<li><code>FUN</code>: The function to apply (e.g., <code>mean</code>, <code>sd</code>).</li>
+</ul>
+<p>For example, to calculate the mean Sepal.Length for each species:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="fu">aggregate</span>(Sepal.Length <span class="sc">~</span> Species, <span class="at">data =</span> iris, <span class="at">FUN =</span> mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="fu">aggregate</span>(Sepal.Length <span class="sc">~</span> Species, </span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">data =</span> iris, </span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">FUN =</span> mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     Species Sepal.Length
 1     setosa        5.006
@@ -975,13 +1026,12 @@ School3  A  B  C  D  E  F  G  H
 3  virginica        6.588</code></pre>
 </div>
 </div>
-<p>Here aggregate has created a data frame with one row per Species and a column for the mean <code>Sepal.Length</code>.</p>
-<p>We can also aggregate multiple measurements simultaneously. For instance, to compute the mean and standard deviation of both <code>Sepal.Length</code> and <code>Sepal.Width</code> by species, we use <code>cbind()</code> on the left side of the tilde (<code>~</code>) to combine the variables, and apply a user-defined function:</p>
+<p>This returns a data frame with one row per <code>Species</code> and a column for the mean <code>Sepal.Length</code>.</p>
+<p>To compute the mean and standard deviation of <code>Sepal.Length</code> and <code>Sepal.Width</code> by <code>species</code>, use <code>cbind()</code> in the formula and a custom function:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">aggregate</span>(<span class="fu">cbind</span>(Sepal.Length, Sepal.Width) <span class="sc">~</span> Species, iris, </span>
-<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>          \(x){</span>
-<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>            <span class="fu">c</span>(<span class="at">Mean =</span> <span class="fu">mean</span>(x), <span class="at">SD =</span> <span class="fu">sd</span>(x))</span>
-<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>          })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="fu">aggregate</span>(<span class="fu">cbind</span>(Sepal.Length, Sepal.Width) <span class="sc">~</span> Species, </span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">data =</span> iris, </span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>          \(x) <span class="fu">c</span>(<span class="at">Mean =</span> <span class="fu">mean</span>(x), <span class="at">SD =</span> <span class="fu">sd</span>(x)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     Species Sepal.Length.Mean Sepal.Length.SD Sepal.Width.Mean Sepal.Width.SD
 1     setosa         5.0060000       0.3524897        3.4280000      0.3790644
@@ -989,13 +1039,25 @@ School3  A  B  C  D  E  F  G  H
 3  virginica         6.5880000       0.6358796        2.9740000      0.3224966</code></pre>
 </div>
 </div>
-<p>If we want to aggregate by multiple factors (say we had another factor like <code>Species</code> and <code>SomeFactor</code>), we could write:</p>
+<p>This returns a data frame with mean and standard deviation for both variables per species.</p>
+<p>If you have multiple grouping factors (e.g., <code>Species</code> and a hypothetical <code>some_factor</code>), include them in the formula:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="fu">aggregate</span>(Sepal.Length <span class="sc">~</span> Species <span class="sc">+</span> SomeFactor, <span class="at">data =</span> iris, <span class="at">FUN =</span> mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Hypothetical example</span></span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a><span class="fu">aggregate</span>(Sepal.Length <span class="sc">~</span> Species <span class="sc">+</span> some_factor, </span>
+<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">data =</span> iris, </span>
+<span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">FUN =</span> mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><code>aggregate()</code> has a formula method and a default method. You can also call it like:</p>
+<p><strong>Default Method</strong></p>
+<p>The default method uses <code>aggregate(x, by, FUN)</code>, where:</p>
+<ul>
+<li><code>x</code>: A vector or data frame of variables to aggregate.</li>
+<li><code>by</code>: A list of grouping factors (e.g., <code>list(group = df$group)</code>).</li>
+<li><code>FUN</code>: The function to apply.</li>
+</ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">aggregate</span>(<span class="at">x =</span> iris[, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], <span class="at">by =</span> <span class="fu">list</span>(<span class="at">Species =</span> iris<span class="sc">$</span>Species), <span class="at">FUN =</span> mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="fu">aggregate</span>(<span class="at">x =</span> iris[, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], </span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">by =</span> <span class="fu">list</span>(<span class="at">Species =</span> iris<span class="sc">$</span>Species), </span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">FUN =</span> mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     Species Sepal.Length Sepal.Width Petal.Length Petal.Width
 1     setosa        5.006       3.428        1.462       0.246
@@ -1003,7 +1065,8 @@ School3  A  B  C  D  E  F  G  H
 3  virginica        6.588       2.974        5.552       2.026</code></pre>
 </div>
 </div>
-<p>Here we explicitly pass a data frame of the first four columns of iris as <code>x</code>, and a list containing the grouping factor (with a name <code>"Species"</code>).</p>
+<p>This returns a data frame with one row per Species and columns for the mean of each measurement variable.</p>
+<p>The formula method is often more intuitive for simple aggregations, while the default method is flexible for aggregating multiple columns without a formula. Both methods produce data frames, making <code>aggregate()</code> versatile. For more modern alternatives, consider <code>dplyr</code>’s <code>group_by()</code> and <code>summarise()</code> for streamlined aggregation.</p>
 </section>
 <section id="applying-functions-by-group-with-by" class="level3" data-number="7.5.2">
 <h3 data-number="7.5.2" class="anchored" data-anchor-id="applying-functions-by-group-with-by"><span class="header-section-number">7.5.2</span> Applying Functions by Group with <code>by()</code></h3>
@@ -1015,7 +1078,7 @@ School3  A  B  C  D  E  F  G  H
 <p>The <code>by()</code> function will split the data frame by the factor(s) you provide, apply the function to each subset, and return an object of class <code>"by"</code> . When printed, this object shows the results for each group in a neat format.</p>
 <p>For instance, using the <code>iris</code> data, if we want to get summary statistics of the numeric variables for each Species, we could do:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="fu">by</span>(iris[, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], iris<span class="sc">$</span>Species, summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">by</span>(iris[, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>], iris<span class="sc">$</span>Species, summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>iris$Species: setosa
   Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
@@ -1053,11 +1116,11 @@ iris$Species: virginica
 <p>The <code>ave()</code> function takes a vector <code>x</code>, splits it according to the grouping factor(s), applies a function <code>FUN</code> (default is mean), and returns a vector of the same length as <code>x</code> where each element is replaced by the computed group summary. This makes it especially handy for adding new columns to data frames based on group-level statistics.</p>
 <p>For example, consider a data frame of test scores for students across different classes:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>students <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">class =</span> <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"B"</span>, <span class="st">"B"</span>, <span class="st">"A"</span>),</span>
-<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">score =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">90</span>, <span class="dv">78</span>, <span class="dv">88</span>, <span class="dv">84</span>, <span class="dv">92</span>)</span>
-<span id="cb104-4"><a href="#cb104-4" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb104-5"><a href="#cb104-5" aria-hidden="true" tabindex="-1"></a>students</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a>students <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb111-2"><a href="#cb111-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">class =</span> <span class="fu">c</span>(<span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"B"</span>, <span class="st">"B"</span>, <span class="st">"A"</span>),</span>
+<span id="cb111-3"><a href="#cb111-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">score =</span> <span class="fu">c</span>(<span class="dv">85</span>, <span class="dv">90</span>, <span class="dv">78</span>, <span class="dv">88</span>, <span class="dv">84</span>, <span class="dv">92</span>)</span>
+<span id="cb111-4"><a href="#cb111-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb111-5"><a href="#cb111-5" aria-hidden="true" tabindex="-1"></a>students</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  class score
 1     A    85
@@ -1070,8 +1133,10 @@ iris$Species: virginica
 </div>
 <p>We can compute the class average for each student and store it in a new column using <code>ave()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>students<span class="sc">$</span>class_avg <span class="ot">&lt;-</span> <span class="fu">ave</span>(students<span class="sc">$</span>score, students<span class="sc">$</span>class, <span class="at">FUN=</span>mean)</span>
-<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>students</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>students<span class="sc">$</span>class_avg <span class="ot">&lt;-</span> <span class="fu">ave</span>(students<span class="sc">$</span>score, </span>
+<span id="cb113-2"><a href="#cb113-2" aria-hidden="true" tabindex="-1"></a>                          students<span class="sc">$</span>class, </span>
+<span id="cb113-3"><a href="#cb113-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">FUN=</span>mean)</span>
+<span id="cb113-4"><a href="#cb113-4" aria-hidden="true" tabindex="-1"></a>students</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  class score class_avg
 1     A    85  89.00000
@@ -1083,7 +1148,7 @@ iris$Species: virginica
 </div>
 </div>
 <p>Now each student has a <code>class_avg</code> value corresponding to the mean score of their class. This technique is useful for comparisons, standardization, or visualization.</p>
-<p>Although the default function for <code>ave()</code> is mean, you can supply other summary functions like <code>median</code>, <code>sd</code>, or even custom ones as long as the function returns a single value per group. However, avoid using functions that return multiple values (like range), since a<code>ve()</code> expects only one summary value per group.</p>
+<p>Although the default function for <code>ave()</code> is mean, you can supply other summary functions like <code>median</code>, <code>sd</code>, or even custom ones as long as the function returns a single value per group. However, avoid using functions that return multiple values (like range), since <code>ave()</code> expects only one summary value per group.</p>
 <p>In summary, <code>ave()</code> is a convenient way to create group-based summary columns that align with the structure of the original data. It complements other aggregation functions by expanding the result across the full dataset instead of collapsing it.</p>
 
 
