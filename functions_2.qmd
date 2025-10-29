@@ -1,0 +1,493 @@
+# Advanced Topics in Writing Functions
+
+Writing your own functions is a key step in becoming proficient with base R. This chapter covers advanced topics in function writing and “functional thinking” – treating functions as building blocks to solve problems. We will explore file handling functions, writing custom directory utilities, understanding function arguments (formal vs. actual, and the special .), R’s argument matching rules, using. for flexible inputs, controlling function output with `invisible()`, lexical scoping and environments, debugging with `browser()`.
+
+## File Handling 
+
+### Commonly Used Functions for Handling Files
+
+Functions in base R can handle files and directories. Many of these functions can be used within customized functions. Some of the most useful functions involving files include:
+
+-   `getwd()` – Returns the current working directory path.
+-   `setwd("path")` - Sets the working directory to the specified path.
+-   `dir()` – Lists files in a directory. It has useful arguments like `path=` (directory to list), `pattern=` (a *regex* to filter filenames), `all.files=` (include hidden files), and `full.names=` (include full paths).
+-   `file.path()` – This function helps create platform-independent path strings by connecting the directory path with the file name.
+-   `file.info()` – Extracts information on files (size, date/time modified, among others), returning a data frame containing columns named ‘size’, ‘isdir’, ‘mode’, ‘timestamps’.
+-   `file.exists()` – Verifies if a given file or directory is existing (returns TRUE or FALSE).
+
+Now, let’s consider a few examples of this: hello
+
+
+```{r}
+# Show current working directory
+getwd() 
+# List files in the current directory 
+dir() 
+# Construct a file path for a data subfolder
+file.path("C:/Users/Student/Documents", "data", "raw_data.txt") 
+# Check existence of a file and get its size
+file.exists("dat1.txt")
+## Get file information
+file.info("dat1.txt")
+```
+
+Other useful functions involving files are `file.create()` (for creating a file), `file.remove()`, `file.rename()`, `file.append()` (for appending information from one file into another), `dir.create()` (for making a directory), and `unlink()` (for deleting directories or files recursively)[6]. Features of R scripts/functions involving files can thus be extended by using all of the aforementioned functions.
+
+### Custom Directory Management Functions
+
+Suppose we need a function which can tell us if there are any sub directories in a given directory, then give us the list of files of those sub directories. The following function will do that:
+
+```{r}
+list_files <- function(dir_name) {
+  # Check that the directory exists
+  if (!file.exists(dir_name)) {
+    stop("The given directory does not exist.")
+  }
+  # Get all items in the directory
+  all_files <- dir(dir_name)
+  if (length(all_files) == 0) {
+    stop("There are no files in the given directory.")
+  }
+  file_names <- list()  # will hold results
+  # Loop over each item; if it's a subdirectory, list its files
+  for (item in all_files) {
+    full_path <- file.path(dir_name, item)
+    # Use file.info()$isdir to check if item is a directory
+    if (file.info(full_path)$isdir) {
+      file_names[[ item ]] <- list.files(full_path)
+    }
+  }
+  if (length(file_names) == 0) {
+    print("There is no subdirectory in the given folder.")
+    return(NULL)
+  } else {
+    return(file_names)
+  }
+}
+```
+
+In this function, we first check if the directory exists (`file.exists()`). For each item in the directory, we create its complete path (`file.path()`) and use `file.info(.)$isdir` to identify if it’s a directory. If it’s a directory, we use `list.files()` function on it, which will give us files in this directory, which we store in vectors (subdirectory names as vector names). If there aren’t subdirectories, it will print a messsage and return NULL. If subdirectories do exist, it will return a vector of vectors.
+
+```{r}
+list_files("Recipe")
+```
+
+This particular function shows how base R facilities, including file handling functions, can be mixed with logic (loops, conditional statements) in order to create more sophisticated tools.
+
+## Function Arguments
+
+### Formal vs. Actual Arguments and the ... Ellipsis
+
+While coding functions, it is important to understand the difference between formal arguments and actual arguments. The parameters defined in functions are known as formal arguments. Actual arguments refer to the values provided during the calling of functions. For instance:
+
+```
+# Define a function with two formal arguments x1 and x2
+f <- function(x1, x2) {
+    # function body (not shown)
+}
+# Call the function with actual arguments var1 and var2
+f(var1, var2)
+```
+
+In this example, `x1` and `x2` represent the formal arguments of the function (placeholders within the function), while `var1` and `var2` are the actual arguments passed in the call. Knowing this difference can help explain how data is passed into functions.
+
+In R, the special formal argument `...` (ellipsis) allows a function to accept any number of additional arguments. This is useful for passing arbitrary optional arguments to another function. For example:
+
+
+```{r}
+simple_T_test <- function(x1, x2, ...) {
+    result <- t.test(x1, x2, ...) 
+    return(result$p.value)        
+}
+
+# Example usage:
+var1 <- rnorm(50, mean = 3, sd = 2)
+var2 <- rnorm(60, mean = 5, sd = 3)
+simple_T_test(var1, var2, var.equal = TRUE)
+```
+
+
+In `simple_T_test()`, the formal arguments are `x1`, `x2`, and. We call `t.test(x1, x2, ...)` inside the function, so any additional arguments we pass into `simple_T_test()` will be forwarded to `t.test()`. In the example, we pass `var.equal = TRUE` as an extra argument, which `t.test()` uses (it treats the two samples as having equal variance). The function then returns the p-value from the test result. Using `...` in this way makes our function flexible – it can handle alternative arguments like `alternative = "greater"` or `conf.level = 0.99` if needed, even though we didn’t explicitly list those in the function definition.
+
+### Argument Matching Rules in R
+
+When you call a function, how do the actual arguments get matched to the formal parameters? R uses a specific set of rules to match arguments by name or position. The rules, in order, are:
+
+1.	**Exact name matching**: If you call a function with some arguments in `name = value` form, any names that exactly match a formal argument name will be matched first.
+2.	**Unique partial name matching**: Remaining unmatched named arguments are then matched by partial matching – if the name you provided partially matches one formal argument and is unique, it will be matched to that formal argument. Partial matching is not recommended as it can lead to ambiguity.
+3.	**Positional matching**: Any arguments left unmatched by name are assigned to the remaining formal arguments in the order they are listed in the function definition.
+4.	**Matching to ...**: If the function has a `...` and there are still additional arguments not matched by the above steps, those arguments will be gathered into the special argument (`...`) for use inside the function.
+
+Consider the function `f()` defined with multiple parameters including `...`:
+
+```{r}
+f <- function(arg1, arg2, argument, arg3, ...) {
+  cat("arg1:", arg1, "\n")
+  cat("arg2:", arg2, "\n")
+  cat("argument:", argument, "\n")
+  cat("arg3:", arg3, "\n")
+  cat("Result from t-test: \n")
+  t.test(...)
+}
+f(arg2 = "first", argu = "third", "second", "fourth", var1, var2)
+```
+
+
+In the call above, we provided six actual arguments to `f()`. Here’s how R matches them to the formal arguments:
+
+-   `arg2 = "first"` matches exactly the formal `arg2` by name (Rule 1).
+-   `argu = "third"` doesn’t exactly match any formal argument, but it is a unique partial match for the formal argument (Rule 2, partial matching: `"argu"` matches `"argument"`). Thus, `argument` gets value `"third"`.
+-   The next two values `"second"` and `"fourth"` are unnamed. This is positional matching (Rule 3); `arg1 = "second"` and `arg3 = "fourth"`.
+-   We still have two extra values `var1` and `var2` with no formal parameters left. Since `f()` has a `...` in its definition, those leftover values fall into `...`. In our example, these values are passed to `t.test()`.
+
+
+### Using the `...` Argument for Flexible Inputs
+
+
+We’ve seen that `...` can capture additional arguments to pass along.  You can also use `...` to explicitly accept a variable number of inputs and then iterate over them inside your function. This is a common pattern for writing functions that aggregate or analyze an arbitrary number of data objects. For example, some functions in base R utilize this technique, such as `paste()` and `cat()`.
+
+```{r}
+paste("a", "b", "c", sep=" + ")
+paste("a", "b", sep="+")
+name <- "John"
+cat("Good morning!\n")
+cat("Good morning ", name, "!\n", sep = "")
+```
+
+Suppose we want a function that takes any number of numeric vectors and returns their means and variances in one go. We can write:
+
+```{r}
+# Summarize any number of numeric vectors
+means_vars <- function(..., na.rm = FALSE) {
+  data_list <- list(...)            # capture inputs
+  if (length(data_list) == 0)
+    stop("Provide at least one vector.")
+
+  # compute per-vector mean/variance using the named options
+  means <- sapply(data_list, \(x) mean(x, na.rm = na.rm))
+  vars  <- sapply(data_list, \(x) var(x, na.rm = na.rm))
+
+  cbind(mean = means, var = vars)
+}
+
+set.seed(1)
+a <- rnorm(5)
+b <- c(1, 2, NA, 4)
+d <- rnorm(3)
+
+means_vars(a, b, d, na.rm = TRUE)
+means_vars(a, b)
+```
+
+There are two arguments in `mean_vars()`. The `...` argument allows users to pass arbitrary numbers of argument to the function. A named argument `na.rm=` is used to control how to handle the missing values in the `mean()` and `var()` functions. Anything after `...` must be named when the function is called.
+
+Within the function, all the arguments that pass through `...` are are gathered into a list. We then use `sapply()` to apply `mean()` and `var()` to each element of that list, obtaining numeric vectors of means and variances. Lastly, we combine those into a two-column matrix and is returned by the function.
+
+The. makes our function flexible – whether we have 1 vector or 100 vectors, `mean_vars()` will handle them.
+
+## Controlling Function Output: `return()` and `invisible()`
+
+The default behavior of an R function is to return the result of the last expression in its body. The `return()` function can be used to return a result explicitly from inside a function. The issue of how values will be printed can be considered a nuance of functions. For instance, if you execute a function in an R environment without assigning it an output, R will auto-print the return value. However, if an assignment of the result is done, then R won’t auto-print the return values. The `invisible()` function provides flexibility on how values will be printed.
+
+Consider the following function that calculates the area of a circle and prints a message:
+
+```{r}
+cal_area <- function(r) {
+    area <- pi * r * r
+    cat("Area is:", area, "\n")
+    return(area)
+}
+# Calling the function without assignment
+cal_area(5)
+
+# Calling the function and assigning the result
+result <- cal_area(5)
+result
+```
+
+In this example, if we directly call `cal_area(5)`, it will both print "Area is: 78.53982" (because of the cat call in the function statement) and then also print "78.53982" (because we didn’t store the return value in anything, so it automatically gets printed by R). Now, in the second case, we store the return value in `result`, so it will only print `"Area is: 78.53982"`, while the "78.53982" will be stored inside `result` (as we can verify by printing `result`). Hence, in both examples, it invoked `return(area)` from the function. The difference is that in one case it gets printed by R, while in the other it doesn’t.
+
+If we do not want the return value automatically printed (perhaps because this function already writes something useful), we can use `invisible()` on the return value. Here’s a variant of the function:
+
+```{r}
+cal_area2 <- function(r) {
+    area <- pi * r * r
+    cat("Area is:", area, "\n")
+    invisible(area)   # return invisibly
+}
+cal_area2(5)
+result <- cal_area2(5)
+result
+```
+
+In `cal_area2()`, we use `invisible(area)` in place of `return(area)`. When calling the function without assignment, we observe that the `cat()` function prints `"Area is: ..."`, though no numeric value follows it. The value is still returned, but it’s returned invisibly – meaning R will not print it unless explicitly asked. 
+
+Now, upon assignment of this output into `result`, we find that we’re basically back where we started; `cat()` statement gets printed, and its value gets assigned into `result`. The use of `invisible()` comes in handy in functions which will usually be called merely as a side effect (printing or plotting, for instance), though they still return an object which has potential use.
+
+## Lexical Scoping and Environments
+
+### Environments and Lookup
+
+R is a lexically scoped language, which has an effect on how functions evaluate values of free variables (variables not defined in the function). The concept of lexical scoping refers to how R searches for the value of the symbol (variable) first in the environment in which it was defined, then in the parental environment. For this explanation, it is important that we understand how environments work[@chambers2008sda].
+
+-   An environment is a set of symbol-value pairs (a set of variables and their values). Each function in R has an environment in which it was created (its enclosing environment).
+
+
+-   Environments are hierarchical, with each environment containing a pointer to its parent environment, except the empty environment at the root. The root environment is the global environment, or the environment of your R session. The global environment is the parent of the environment of user-defined functions defined at the top level. The chain of parent environments eventually ends at the base package environment.
+
+-   Each time you call a function, R makes a fresh evaluation environment that contains the function’s arguments (bound to the values you passed) and any local variables created during the call. That environment’s parent is the function’s enclosing environment—the place where the function was defined.
+
+A simple demonstration of how scoping works:
+
+```{r}
+# R looks for variables in its defined environment first, then up the chain.
+sqrt(3)
+# Redefine sqrt in the global environment
+sqrt <- function(x) x * x    # our custom sqrt function (squares the input)
+sqrt(3)
+```
+
+What’s happened in this snippet is that we temporarily masked the base R function `sqrt()` by assigning our own function the name `sqrt()` in the global environment. Later on, when we typed `sqrt(3)`, it invoked our `sqrt()` function (returning 9) rather than the base `sqrt()` function. This occurred since R searched first in the global environment (where we defined the `sqrt()` function), then in the base environment. The following illustrates the search path that R uses:
+
+```{r}
+search()
+```
+
+We see that `".GlobalEnv"` (global environment) is searched first, followed by `"package:base"` as last. After finishing this example, it’s a good idea to remove or rename the custom `sqrt()` to avoid confusion with the base function.
+
+### Lexical Scoping
+
+The significance of lexical scoping arises in the context of free variables in functions. The free variable is the symbol which is used in a function but is not considered as a parameter of the function nor defined in the function. For example:
+
+```{r}
+g <- function(x) {
+    a <- 2       # local variable a
+    x + y + a    # y is not defined inside g -> free variable
+}
+```
+
+
+The variable `y` is a free variable in function `g()`. According to lexical scoping rules, `g()` will first look into the environment from which `g()` was created. Since we defined `g()` at the top level, this is the global environment. The global environment will provide the value of `y` if it’s defined there. Otherwise, R will continue looking into attached packages, giving an error if it doesn’t find it.
+
+Let's illustrate with a concrete scenario:
+
+```{r}
+y <- 2            # define y in the global environment
+g <- function(x) {
+    a <- 2        # local to g
+    x + y + a     # y is free, will be looked up in enclosing env (global)
+}
+f1 <- function(x) {
+    y <- 1        # local y in f1
+    y + g(x)      # calls g, which will use global y
+}
+f1(1)
+```
+
+
+In this code, the function `g(x)` uses `y` (global) and `a` (local to g). We then define `f1(x)` which has its own local variable `y` and calls `g(x)`. 
+
+When we call `f1(1)`, the computation inside `f1()` proceeds as follows:
+
+-   `y` = 1 (`y <- 1`). (the local variable)
+-   `y + g(x)` $\rightarrow$ `1 + g(x)` 
+-   Calling `g(x)` is called. Inside g():
+
+    -   `x` = 1 (passed from `f1()`)
+    -   `a` = 2 (`a <- 2`)
+    -   In `x + y + a`, `y` is a free variable. R looks it up in the enclosing environment (the global environment), where `y <- 2`. Therefore `x + y + a` $\rightarrow$ `1 + 2 + 2 = 5`, and `g()` returns 5.
+    
+-   Lastly, in the final expression inside `f1()`, `y + g(x)` $\rightarrow$ `1 + 5 = 6`. Note that the value of `y` used here is the local variable within `f1()`, which equals 1.
+    
+The key point: the `y <- 1` in `f1()` did not affect the `y` used inside `g()`. If R were using dynamic scoping (where a function would look for variables in the calling environment), `g()` would have found `y = 1` from `f1()`. But R uses lexical scoping, so `g()` uses the global `y = 2`. 
+
+Consider another scenario where `g()` is defined inside `f2()`:
+
+```{r}
+f2 <- function(x){
+  g <- function(x){
+    a <- 2
+    x + y + a
+  }
+  y <- 1        
+  y + g(x)
+}
+f2(1)
+```
+
+
+When we run `f2(1)`, here’s how the computation inside `f2()` unfolds:
+
+-   `g()` is defined.
+-   `y` = 1 (`y <- 1`). (the local variable)
+-   `y + g(x)` $\rightarrow$ `1 + g(x)` 
+-   Calling `g(x)` is called. Inside g():
+
+    -   `x` = 1 
+    -   `a` = 2 (`a <- 2`)
+    -   In `x + y + a`, `y` is a free variable. R looks it up in the enclosing environment (the `f2()` function), where `y <- 1`. Therefore `x + y + a` $\rightarrow$ `1 + 1 + 2 = 4`, and `g()` returns 4.
+
+-   In the final expression inside `f2()`, `y + g(x)` $\rightarrow$ `1 + 4 = 5`. 
+
+These example highlights how functions “carry” their defining environment with them.
+
+
+## Debugging Functions with `browser()`
+
+While coding functions, it is unavoidable that you will need to debug them. For that, there are several methods in base R, and the simplest form is using the `browser()` function. If `browser()` is used inside a function, it will result in the code stopping there, allowing it to shift to a debugging mode.
+
+
+Consider this function:
+
+```{r}
+my_function <- function(x) {
+    y <- x + 2
+    browser()    # Pause here for debugging
+    z <- y * 3  # This will run after you continue from browser
+    return(z)
+}
+```
+
+If we run `my_function(5)`, R will enter the browser mode when it hits the `browser()` call:
+
+```{r, eval=FALSE}
+my_function(5)
+# Called from: my_function(5)
+# Browse[1]> 
+```
+
+The function is paused at the `Browse[1]>` prompt. Now we can type commands to explore the function environment or alter the execution. For instance, we can type the name of a variable, and it will display its value. If we type `y` at the prompt, we will see `7` displayed, since `y` equals `x + 2` and `x` was 5.
+
+Additionally, we can use commands such as `n` (next) to run the next line of the function or `c` (continue) to continue running the function until it finishes or another breakpoint is reached.
+
+If we choose that we've completed the process, we can type `Q` to end the browser, exiting the function. The `browser()` function is an efficient way to identify problems by viewing the expression’s environment at a particular location in a function. However, once we are satisfied that we are using it correctly, we need to delete (or comment out) the expression `browser()`.
+
+
+## Case Study: Chi-Square Test Function with Subgroups
+
+As a practical application of the concepts above, let's build a function that performs a chi-squared contingency test on a dataset. The following data `ht` contains three variables, including sex, race and height. 
+
+```{r}
+ht <- readRDS("ht.rds")
+head(ht)
+summary(ht)
+```
+
+To investigate whether someone's `height` varies by their `sex`, we can use the two-sample t-test. Alternatively, you can use the chi-square test to evaluate the association between gender and height. In this case, we need to recode the height variable as a categorical or indicator variable, such as `height_cat`, where `height_cat` = 1 if `height` is greater than a threshold value (e.g., the mean height), and `height_cat` = 0 otherwise. For example:
+
+```{r}
+height_cat <- ht$height>63
+table(height_cat, ht$sex)
+chisq.test(height_cat, ht$sex)
+```
+
+Note that to perform a valid chi-square test, all expected counts in each cell of the two-by-two table must be greater than or equal to 5, which can be obtained from the result of the `chisq.test()` function. For example:
+
+```{r}
+chisq.test(height_cat, ht$sex)$expected
+```
+
+For this task, we would like to generate a table (a data frame) that contains the chi-square statistics between the `sex` and `height_cat` variables for all people and the people within each ethnic group. The table should consist of four columns, with each row containing testing statistics for either all subjects combined or a specific racial group.
+
+-   `Group`: labeled as 'All' for all subjects combined, or each racial group, such as 'A', 'B', and/or 'W'.
+-   `Test`: indicates whether the chi-square test is valid or not. If one of the expected counts is less than 5, the Test column should have the value `"not valid"`; otherwise, it should be `"valid"`.
+-   `Chisq`: contains the chi-square statistics.
+-   `P`: contains the corresponding P-values.
+
+We will create two functions: 
+
+1. `chi_sq()` – which performs a chi-square test for either all subjects or a specific ethnic group. The result should be a data frame with a single row.
+2.  `chi_sq_all()` – which uses `chi_sq()` to produce a summary table for all subgroups, including all subjects combined and the user-specified subgroups.
+
+
+```{r}
+chi_sq <- function(dat, chr_var, num_var, cut_off = NULL, ...) {
+    # If cut_off is not provided, use the mean of the numeric variable
+    if (is.null(cut_off)) {
+        cut_off <- mean(dat[, num_var])
+    }
+    # Ensure cut_off is within the range of the numeric variable
+    if (cut_off <= min(dat[, num_var]) || cut_off >= max(dat[, num_var])) {
+        stop("The cut_off value must be within the range of numVar.")
+    }
+    # Create an indicator for whether num_var exceeds the cutoff
+    num_ind <- dat[, num_var] > cut_off
+    # Perform chi-square test on the categorical variable vs the indicator
+    chi_res <- chisq.test(dat[, chr_var], num_ind, ...)
+    # Determine if test is valid (all expected counts >= 5)
+    valid_flag <- ifelse(any(chi_res$expected < 5), "not valid", "valid")
+    # Return a one-row data frame with results
+    data.frame(test = valid_flag,
+               Chisq = as.numeric(chi_res$statistic),
+               P = chi_res$p.value)
+}
+chi_sq(ht, "sex", "height", 60)
+chi_sq(ht[ht$race == "A", ], "sex", "height", correct = FALSE)
+```
+
+In this function:
+
+-   `dat`: a data frame containing the data for one group or the whole dataset.
+-   `chr_var`: the name of the categorical variable (e.g., `"sex"`).
+-   `num_var`: the name of the numeric variable (e.g., `"height"`).
+-   `cut_off`: a numeric threshold for num_var to categorize it; if `NULL`, we use the mean of `numVar` as the threshold value.
+-   `...`: additional arguments to pass to `chisq.test()` (for example, `correct = FALSE` to disable Yates’ continuity correction).
+
+Inside `chi_sq()`:
+
+-   We compute `cut_off` if not provided, and we validate that this `cut_off` lies between the minimum and maximum of the numeric variable—otherwise, the test is not meaningful, and we stop with an error message. 
+-   We then create a logical vector `num_ind`, which is TRUE for observations where `num_var > cut_off` (and FALSE otherwise). 
+-   The chi-square test (`chisq.test()`) is performed on the two categorical variables: `dat[, chr_var]` (e.g., `sex`) and `num_ind` (`height` above threshold). 
+-   We capture any extra arguments via `...` and pass them along to `chisq.test()` (this could include `correct=FALSE` or `simulate.p.value=TRUE`, etc., if specified). 
+-   We then examine `chi_res$expected`, which is the table of expected counts; if any expected count is less than 5, we mark the test as `"not valid"` (a common rule-of-thumb for chi-square tests). 
+-   Finally, we return a data frame with the validity flag, the chi-square statistic, and the p-value.
+
+Now for the wrapper function `chi_sq_all()` that iterates over groups:
+
+```{r}
+chi_sq_all <- function(..., dat, group_var, chr_var, num_var, 
+                       cutOff = NULL, correct = FALSE) {
+    # Capture the ... group values (if any) into a vector
+    groups <- c(...)  
+    if (length(groups) == 0) {
+        # If no groups specified, use all unique values of group_var
+        groups <- unique(as.character(dat[, group_var]))
+    }
+    # Verify that all specified groups actually exist in data
+    if (!all(groups %in% as.character(dat[, group_var]))) {
+        stop("One or more specified groups are not present in the data.")
+    }
+    # Start with "All" (overall data) result
+    overall_res <- chi_sq(dat, chr_var, num_var, cutOff, correct = correct)
+    results_table <- data.frame(Group = "All", overall_res)
+    # Loop through each specified subgroup and get chi-square results
+    for (grp in groups) {
+        sub_data <- dat[dat[, group_var] == grp, ]
+        grp_res <- chi_sq(sub_data, chr_var, num_var, cutOff, 
+                          correct = correct)
+        # Add a column for group identifier
+        grp_res <- data.frame(Group = grp, grp_res)
+        # Append to results_table
+        results_table <- rbind(results_table, grp_res)
+    }
+    print(results_table)      # print the table for the user
+    invisible(results_table)  # return it invisibly
+}
+chi_sq_all ("A", dat = ht, group_var ="race", chr_var = "sex", 
+            num_var = "height")
+chi_sq_all ("A", "W", dat = ht, group_var ="race", chr_var = "sex", 
+             num_var = "height")
+chi_sq_all (dat = ht, group_var ="race", chr_var = "sex", 
+             num_var = "height")
+```
+
+Key aspects of chi_sq_all():
+
+
+-   The `...` in the function definition is used in a unique way here: it’s intended to capture one or more group values (e.g., `"A"`, `"B"`). We immediately convert `...` to a vector groups. If `...` is empty, we default to all unique groups in the data (so the analysis will cover every group) .
+-   We ensure the specified groups actually exist in the data; if not, we throw an error with `stop()`.
+-   We first compute the overall (`"All"`) result by calling `chi_sq()` on the full dataset. This provides the chi-square test ignoring subgroups. We store that in a data frame with a new column `Group = "All"`.
+-   Then we loop over each group in groups. For each `grp`, we subset the data (`dat[dat[, groupVar] == grp, ]` gives the data for that group), and call `chi_sq()` on that subset. We get a one-row result, add a `Group` column for the group name, and use `rbind()` to append it to our results table.
+-   We use the `correct=` argument (which defaults to FALSE here for illustration) and pass it down to `chi_sq()` (which passes it to `chisq.test()`) to control Yates' correction. This demonstrates how you can include specific arguments in your wrapper and still use `...` for group selection independently.
+-   Finally, we p`rint(results_table)` so that the user sees the table, and return it invisibly (so that if the user assigns the result to a variable, they won’t get it printed twice).
+

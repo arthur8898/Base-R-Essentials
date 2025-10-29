@@ -16,6 +16,7 @@ book:
     - functions.qmd
     - iteration.qmd
     - manipulations.qmd
+    - functions_2.qmd
 
 
 bibliography: references.bib
