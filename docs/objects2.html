@@ -217,6 +217,12 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Data Manipulations</span></span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./functions_2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Advanced Topics in Writing Functions</span></span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -750,20 +756,20 @@ speed         3.932409  0.4155128  9.463990 1.489836e-12</code></pre>
 <span id="cb87-5"><a href="#cb87-5" aria-hidden="true" tabindex="-1"></a>hw_matrix</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       height   weight
-[1,] 66.66340 169.1774
-[2,] 60.84223 162.7399
-[3,] 63.56746 165.4398
-[4,] 56.39137 139.7122
-[5,] 57.57282 146.1678</code></pre>
+[1,] 60.23871 154.5176
+[2,] 61.92808 172.4441
+[3,] 66.12886 163.8355
+[4,] 65.05564 134.9822
+[5,] 61.62618 173.1605</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">group =</span> v, hw_matrix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  group   height   weight
-1     A 66.66340 169.1774
-2     A 60.84223 162.7399
-3     B 63.56746 165.4398
-4     B 56.39137 139.7122
-5     C 57.57282 146.1678</code></pre>
+1     A 60.23871 154.5176
+2     A 61.92808 172.4441
+3     B 66.12886 163.8355
+4     B 65.05564 134.9822
+5     C 61.62618 173.1605</code></pre>
 </div>
 </div>
 <p>This example illustrates how the <code>group</code> variable, with values tailored to match the number of rows, is assigned to each row of the resulting data frame.</p>
@@ -772,11 +778,11 @@ speed         3.932409  0.4155128  9.463990 1.489836e-12</code></pre>
 <div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">group =</span> <span class="st">"A"</span>, hw_matrix)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  group   height   weight
-1     A 66.66340 169.1774
-2     A 60.84223 162.7399
-3     A 63.56746 165.4398
-4     A 56.39137 139.7122
-5     A 57.57282 146.1678</code></pre>
+1     A 60.23871 154.5176
+2     A 61.92808 172.4441
+3     A 66.12886 163.8355
+4     A 65.05564 134.9822
+5     A 61.62618 173.1605</code></pre>
 </div>
 </div>
 <p>The reason these examples work is that the <code>data.frame()</code> function implicitly coerces the matrix into a data frame. Alternatively, you can explicitly coerce an object to a data frame using the <code>as.data.frame()</code> function:</p>
@@ -1110,11 +1116,11 @@ Art        95    99   M     57    175        FALSE</code></pre>
 <span id="cb151-5"><a href="#cb151-5" aria-hidden="true" tabindex="-1"></a>dat1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  numVar charVar
-1   1.31    &lt;NA&gt;
-2   1.53       a
-3   1.25       b
-4  -0.66       c
-5  -1.00       d
+1   0.15    &lt;NA&gt;
+2   1.18       a
+3  -0.66       b
+4  -0.28       c
+5  -0.28       d
 6     NA       e</code></pre>
 </div>
 </div>
